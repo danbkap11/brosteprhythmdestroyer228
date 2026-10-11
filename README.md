@@ -1,6 +1,6 @@
 # BALKAN//BASS
 
-A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, synthesized FM/growl, talking and vowel basses, a punchy accent bass on the first riff hit of each drop bar, clean mono sub, and bundled CC0 drum/FX one-shots. Its seeded 24-bar loop moves through intro (2 bars), build (2), drop A (8), break (2), build (2), and drop B (8). At 140 BPM it lasts about **41.14 seconds**.
+A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, synthesized FM/growl, talking and vowel basses, a punchy accent bass on the first riff hit of each drop bar, clean mono sub, and bundled CC0 drum/FX one-shots. Seeded bass contours and phrase endings vary the melody and rhythm. One or both buildups end with a one-beat pause and an original, synthetic voice-like shout before the drop. Its 24-bar loop moves through intro (2 bars), build (2), drop A (8), break (2), build (2), and drop B (8). At 140 BPM it lasts about **41.14 seconds**.
 
 ## Get it running on macOS
 
@@ -9,7 +9,7 @@ A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, synthesized FM/grow
 3. Set your Mac's sound output and start at a low speaker/headphone volume.
 4. Close any older BALKAN//BASS window first; evaluating while it is open only focuses that existing session. Open `main.scd` in the SuperCollider IDE. Press **Command+A**, then **Command+Return** to evaluate the whole file. Wait until the new BALKAN//BASS window says **Ready** and press **Play**. The app does not play automatically.
 
-Drop A starts after about **6.86 seconds**; Drop B starts after about **27.43 seconds**. Press **Stop** before changing the seed, density, variation or preset. Enter a seed and click **Generate** to make a new plan; **Play** restarts it from bar one. The same seed and controls select the same planned events, though synthesized noise may differ between plays. The six bass sliders affect new notes, and tempo changes take effect at the next bar. Closing the window releases this app's audio resources.
+Drop A starts after about **6.86 seconds**; Drop B starts after about **27.43 seconds**. The selected pre-drop shout is near the end of the buildup immediately before one of those drops. Press **Stop** before changing the seed, density, variation or preset. Enter a seed and click **Generate** to make a new plan; **Play** restarts it from bar one. The same seed and controls select the same planned events, though synthesized noise may differ between plays. The six bass sliders affect new notes, and tempo changes take effect at the next bar. Closing the window releases this app's audio resources.
 
 The project includes [CC0 sample credits](assets/samples/README.md). These are licensed one-shots and original synth sounds, not samples from a commercial artist's recordings.
 
