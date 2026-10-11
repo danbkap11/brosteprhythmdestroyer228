@@ -24,7 +24,7 @@
             Env.asr(0.001, 1, release.clip(0.005, 0.05), -4),
             gate.clip(0, 1), doneAction: 2
         );
-        var ampCtl = Lag.kr(amp.clip(0, 0.30), 0.01);
+        var ampCtl = Lag.kr(amp.clip(0, 0.32), 0.01);
         var growlCtl = Lag.kr(growl.clip(0, 1), 0.015);
         var movementCtl = Lag.kr(movement.clip(0, 1), 0.015);
         var aggressionCtl = Lag.kr(aggression.clip(0, 1), 0.015);
@@ -56,9 +56,11 @@
             (1 - movementCtl + (movementCtl * motion));
         var sawL = Saw.ar(freqCtl * 0.995);
         var sawR = Saw.ar(freqCtl * 1.005);
+        var octaveSaw = Saw.ar(freqCtl * 2);
         var mod = SinOsc.ar(freqCtl * 2, 0, freqCtl * fmDepth);
         var fm = SinOsc.ar(freqCtl + mod);
-        var body = (fm * 0.68) + ((sawL + sawR) * 0.20 * textureCtl);
+        var body = (fm * 0.68) + ((sawL + sawR) * 0.20 * textureCtl)
+            + (octaveSaw * 0.13 * textureCtl);
         var preFiltered = LPF.ar(body, 6000);
         var drive = 1.5 + (6 * aggressionCtl);
         var shaped = (preFiltered * drive).tanh / drive.tanh.max(0.1);
@@ -70,7 +72,13 @@
         );
         var rqCtl = Lag.kr(rq.clip(0.25, 0.8), 0.02);
         var filtered = RLPF.ar(shaped, movingCutoff, rqCtl);
-        var mid = LeakDC.ar(((filtered * 1.55) + (shaped * 0.25)).tanh);
+        var throat = (BPF.ar(shaped,
+            ((520 + (motion * 1100)) * toneRatio).clip(350, 3200), 0.30)
+                * 0.85) + (BPF.ar(shaped,
+            ((1400 + ((1 - motion) * 950)) * toneRatio).clip(800, 4400),
+            0.35) * 0.60);
+        var mid = LeakDC.ar(((filtered * 1.30) + (throat * 1.35)
+            + (shaped * 0.23)).tanh);
         var side = LeakDC.ar((sawL - sawR) * 0.5 * textureCtl);
         var wideSide = HPF.ar(HPF.ar(side, 180), 180) * (0.35 * widthCtl);
         var stereo = [mid + wideSide, mid - wideSide];

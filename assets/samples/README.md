@@ -52,3 +52,14 @@ trimmed from the preview, high-passed, faded and saved as mono 44.1 kHz PCM.
 The app uses this original shout near one or both drops; its synthesized
 `bbShout` remains a fallback if the file is missing. No commercial vocal or
 artist recording is included.
+
+`attack_kick.wav` comes from the high-quality preview of
+[“Kick - Attack.wav” by TechGeekMusic](https://freesound.org/people/TechGeekMusic/sounds/353395/),
+and `beefy_snare.wav` from the high-quality preview of
+[“Dubstep Snare #2 - Beefy” by mrbossosity](https://freesound.org/people/mrbossosity/sounds/774955/).
+Both sound pages label the sounds **Creative Commons 0**. The local versions
+were trimmed, high-passed, faded and reduced in level before conversion to
+mono 44.1 kHz, 16-bit PCM WAV. The kick supplies attack above the synthesized
+kick's low body; the snare replaces the former stack of multiple snare samples
+on drop beats. These are style-appropriate licensed one-shots, not a claim of
+being the exact samples used in any artist's recording.

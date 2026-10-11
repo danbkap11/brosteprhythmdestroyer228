@@ -17,10 +17,19 @@
                 [[2, 6, 9, 14], [0, 2, 10, 12, 15]],
                 [[3, 6, 10, 14], [2, 5, 9, 13]]
             ];
+            // A few two-bar calls leave room for a sustained wobbling answer.
+            var longCallPairs = [
+                [[0, 9, 12], [2, 5, 10, 14]],
+                [[2, 10, 13], [0, 3, 9, 14]],
+                [[0, 10, 14], [3, 6, 11, 15]],
+                [[2, 9, 12, 15], [0, 10, 13]]
+            ];
             var introRiffs = [[2], [5], [10], [2, 12], [3]];
             var buildRiffs = [[2, 10], [3, 11], [2, 6, 10], [5, 10]];
             var rootA;
             var rootB;
+            var rootIndexA;
+            var rootIndexB;
             var introIndex;
             var buildIndex;
             var cellRiffs;
@@ -32,13 +41,27 @@
             var shoutBars;
 
             thisThread.randSeed = app[\seed];
-            rootA = rootOrders.choose;
-            rootB = rootOrders.choose;
+            rootIndexA = rootOrders.size.rand;
+            rootIndexB = (rootIndexA + 1 + (rootOrders.size - 1).rand)
+                % rootOrders.size;
+            rootA = rootOrders[rootIndexA];
+            rootB = rootOrders[rootIndexB];
             introIndex = introRiffs.size.rand;
             buildIndex = buildRiffs.size.rand;
-            cellRiffs = Array.fill(8, { riffPairs.choose });
+            cellRiffs = Array.fill(8, { |cellIndex|
+                var useLong = [2, 6].includes(cellIndex);
+                if (useLong.not) {
+                    useLong = 1.0.rand <
+                        (0.25 + (app[\variation] * 0.55));
+                };
+                if (useLong, {
+                    longCallPairs.choose
+                }, {
+                    riffPairs.choose
+                })
+            });
             cellVoices = Array.fill(8, { 3.rand });
-            cellReplies = Array.fill(8, { [0, 0, 7, 12].choose });
+            cellReplies = Array.fill(8, { [0, 5, 7, 12].choose });
             cellKicks = Array.fill(8, { [6, 10, 14].choose });
             cellHats = Array.fill(8, { 3.rand });
             cellWobble = Array.fill(8, { [1, 2].choose });
@@ -136,10 +159,11 @@
                             1.0.rand < (0.05 + (app[\density] * 0.25))
                         };
                         if (sectionBar == 1) {
-                            if ([12, 13].includes(step)) { snare = true };
-                            if (step == 10) { tom = \tomHigh };
-                            if (step == 12) { tom = \tomMid };
-                            if (step == 13) { tom = \tomLow };
+                            // Roll toward, then clear space for, the shout.
+                            if ([9, 10, 11].includes(step)) { snare = true };
+                            if (step == 8) { tom = \tomHigh };
+                            if (step == 10) { tom = \tomMid };
+                            if (step == 11) { tom = \tomLow };
                         };
                     };
                     if (isDrop) {
@@ -185,17 +209,20 @@
 
                     if (bassHit) {
                         var position = activeRiff.indexOf(step);
-                        var wobbleHit = isDrop and: {
-                            position == cellWobble[cell]
-                        };
+                        var wobbleHit;
                         nextStep = if (position < (activeRiff.size - 1), {
                             activeRiff[position + 1]
                         }, {
                             config[\stepsPerBar]
                         });
                         gapSteps = nextStep - step;
+                        wobbleHit = isDrop and: {
+                            (position == cellWobble[cell]) or: {
+                                (position == 0) and: { gapSteps >= 7 }
+                            }
+                        };
                         durBeats = (gapSteps * config[\stepBeats] * 0.94)
-                            .clip(0.17, 1.8);
+                            .clip(0.17, 2.6);
                         if (isBuild and: { sectionBar == 1 }) {
                             durBeats = durBeats.min(
                                 ((12 - step) * config[\stepBeats] * 0.72)
@@ -204,7 +231,7 @@
                         };
                         bassMidi = root + 12;
                         if (isDrop and: { step >= 9 } and: {
-                            1.0.rand < (0.20 + (app[\variation] * 0.65))
+                            1.0.rand < (0.30 + (app[\variation] * 0.50))
                         }) {
                             bassMidi = bassMidi + cellReplies[cell];
                         };
@@ -214,15 +241,19 @@
                                 1, { if (step < 8, { \bbYoi }, { \bbTalking }) },
                                 2, { if (step < 8, { \bbTalking }, { \bbYoi }) }
                             );
-                            // Replace the first riff note with a harder attack.
-                            // This does not add another low-frequency voice.
-                            if (step == activeRiff[0]) { bassVoice = \bbAccent };
+                            // Short calls punch; long calls keep the growl voice
+                            // so its modulation and full note tail can develop.
+                            if (step == activeRiff[0]) {
+                                bassVoice = if (gapSteps >= 7, {
+                                    \bbGrowl
+                                }, { \bbAccent });
+                            };
                         };
                         bassEvent = (
                             synth: bassVoice,
                             midi: bassMidi,
                             amp: if (isDrop, {
-                                if (step == activeRiff[0], { 0.32 }, { 0.27 })
+                                if (step == activeRiff[0], { 0.31 }, { 0.27 })
                             }, {
                                 if (isBuild, { 0.16 }, { 0.11 })
                             }) * accent,
@@ -254,12 +285,20 @@
                                 .clip(0.12, 0.25);
                             // Leave the next sixteenth clear if this cell can
                             // place its extra kick there.
-                            if (isDrop and: { (bar % 2) == 1 } and: {
+                            if (isDrop and: {
                                 cellKicks[cell] == (step + 1)
                             }) {
                                 subMidi = nil;
                             };
                         };
+                    };
+                    // Delay the clean sub until the kick's transient has passed
+                    // when a long call starts on the downbeat.
+                    if (isDrop and: { activeRiff[0] == 0 } and: {
+                        step == 2
+                    }) {
+                        subMidi = root;
+                        subDecay = 0.28;
                     };
 
                     plan.add((
@@ -282,10 +321,12 @@
                         }),
                         snareAmp: if (isDrop, { 0.30 }, {
                             if (isBuild, {
-                                if ([12, 13].includes(step), { 0.12 }, { 0.28 })
+                                if ([9, 10, 11].includes(step), {
+                                    0.09 + ((step - 9) * 0.035)
+                                }, { 0.28 })
                             }, { 0.20 })
                         }),
-                        snareSample: if (isDrop, { \snareSlam }, { \hardSnare }),
+                        snareSample: if (isDrop, { \beefySnare }, { \hardSnare }),
                         subMidi: subMidi,
                         subAmp: if (isDrop, { 0.20 }, { 0.12 }),
                         subDecay: subDecay,
@@ -386,18 +427,23 @@
                             if (event[\kick]) {
                                 kick.value(event[\kickAmp]);
                                 if (isDrop) {
-                                    sample.value(\electroKick, 0.17, 170);
+                                    if (sample.value(\attackKick, 0.24, 145).not) {
+                                        sample.value(\electroKick, 0.17, 170);
+                                    };
                                 };
                             };
                             if (event[\snare]) {
                                 snare.value(event[\snareAmp]);
-                                sample.value(event[\snareSample],
-                                    if (isDrop, { 0.25 }, { 0.08 }), 110);
+                                if (sample.value(event[\snareSample],
+                                    if (isDrop, { 0.25 }, { 0.08 }), 135).not) {
+                                    if (isDrop) {
+                                        sample.value(\snareSlam, 0.22, 135);
+                                    };
+                                };
                                 if (isDrop) {
-                                    sample.value(\hardClap, 0.13, 700, 0.28);
-                                    sample.value(\trapSnare, 0.08, 550, 0.12);
+                                    sample.value(\hardClap, 0.12, 700, 0.28);
                                     if (event[\section] == \dropB) {
-                                        sample.value(\clap, 0.06, 450);
+                                        sample.value(\clap, 0.05, 450);
                                     };
                                 };
                             };
@@ -470,7 +516,7 @@
                                     Synth.tail(source, \bbBassTop, [
                                         \out, out, \freq, bass[\midi].midicps,
                                         \dur, bass[\durBeats] / app[\clock].tempo,
-                                        \amp, 0.075
+                                        \amp, 0.095
                                     ]);
                                 };
                             };

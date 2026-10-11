@@ -1,11 +1,13 @@
 // Paths are relative to main.scd. Missing files leave the synth fallback intact.
 (
     electroKick: "assets/samples/electro_kick.wav",
+    attackKick: "assets/samples/attack_kick.wav",
     electroSnare: "assets/samples/electro_snare.wav",
     hardSnare: "assets/samples/hard_snare.wav",
     clap: "assets/samples/clap.wav",
     hardClap: "assets/samples/hard_clap.wav",
     trapSnare: "assets/samples/trap_snare.wav",
+    beefySnare: "assets/samples/beefy_snare.wav",
     closedHat: "assets/samples/closed_hat.wav",
     tightHat: "assets/samples/tight_hat.wav",
     openHat: "assets/samples/open_hat.wav",
