@@ -4,7 +4,7 @@
     stepsPerBar: 16,
     stepBeats: 0.25,
     grouping: [4, 4, 4, 4],
-    bars: 24,
+    bars: 28,
     seed: 228,
     density: 0.55,
     variation: 0.25,

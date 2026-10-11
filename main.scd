@@ -20,6 +20,8 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     var screechDef;
     var raveDef;
     var duckDef;
+    var atmosphereDef;
+    var sparkDef;
     var samplePaths;
     var masterDef;
     var setupLifecycle;
@@ -61,6 +63,8 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     screechDef = readModule.value("src/synthdefs/bass_screech.scd");
     raveDef = readModule.value("src/synthdefs/rave.scd");
     duckDef = readModule.value("src/synthdefs/duck.scd");
+    atmosphereDef = readModule.value("src/synthdefs/atmosphere.scd");
+    sparkDef = readModule.value("src/synthdefs/spark.scd");
     samplePaths = readModule.value("src/samples.scd");
     masterDef = readModule.value("src/routing.scd");
     setupLifecycle = readModule.value("src/lifecycle.scd");
@@ -110,7 +114,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     app[\error] = nil;
     app[\synthDefs] = drumDefs ++ bassDefs ++
         [talkingDef, yoiDef, accentDef, bassTopDef, shoutDef, sampleDef,
-            sampleBassDef, screechDef, raveDef, duckDef];
+            sampleBassDef, screechDef, raveDef, duckDef, atmosphereDef, sparkDef];
     if (app[\synthDefs].every { |definition| definition.isKindOf(SynthDef) }.not) {
         Error("A SynthDef module did not compile. Check the first Post Window error.").throw;
     };

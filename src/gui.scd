@@ -163,7 +163,7 @@
             defaultsButton = Button(window, Rect(262, 542, 110, 30))
                 .states_([["Defaults"]]);
             StaticText(window, Rect(390, 542, 290, 30))
-                .string_("4/4 · halftime · 24-bar build/drop");
+                .string_("4/4 · halftime · 28-bar build/drop");
 
             playButton.action_({ app[\start].value });
             stopButton.action_({ app[\stop].value });

@@ -4,8 +4,8 @@
 
 The user's latest listening direction supersedes the earlier 7/8 contract:
 **140 quarter-note BPM, 4/4 halftime, 16 sixteenth-note steps per bar**, with
-the main snare on step 8. The current loop is 24 bars / about 41.14 seconds:
-intro 2 → build 2 → drop A 8 → break 2 → build 2 → drop B 8. Drop A begins
+the main snare on step 8. The current loop is 28 bars / 48 seconds:
+intro 2 → build 2 → drop A 8 → break 4 → build 4 → drop B 8. Drop A begins
 after about 6.86 seconds. Keep seeded, pre-generated riffs, a separate mono
 sub, native GUI, protected master, and owned-resource cleanup. The bundled
 CC0 drum/FX one-shots and bounded mid-bass voices serve this listening
@@ -13,7 +13,31 @@ iteration; no external download is required. Export and formal tests remain
 deferred. Sections below this Quick MVP note describe historical planning,
 including a superseded 7/8 version.
 
-The 2026-10-11 rework adds an original seeded rave/brass hook, six composed
+The subsequent seed/arrangement iteration preserves the drop synthesis but
+generates a seed-specific ancestral motif and mutates its onsets, lengths,
+endings and register across phrases. Stable anchors keep thematic identity;
+rhythm, melody and harmony must change between seeds rather than only hats.
+The four-bar break resolves the preceding drop, develops the hook over a
+chord bed, returns sparse counterline/percussion, then connects to the build.
+Seeded generation remains separate from playback; Play reuses the stored plan.
+
+Two small supporting modules return one SynthDef each: `bbAtmosphere` in
+`src/synthdefs/atmosphere.scd` and `bbSpark` in `src/synthdefs/spark.scd`.
+Both use `out/freq/amp/dur/gate/beatHz/duckBus/tone/width`; Atmosphere also
+accepts `thirdSemis/fifthSemis`. Their final high-pass is 300 Hz, with bounded
+levels, mono-safe width, finite lifetime and optional kick ducking. They write
+to the same mix bus inside the owned source group, requiring no new routing
+or clock. The pad lasts at most 4.5 s; the spark's dry note is at most 0.6 s
+with finite echo taps (total at most about 1.11 s). Stop/cuts free their tails.
+
+Optional plan fields `pad`, `spark`, and `perc` contain resolved note data
+or nil. Pad data: `midi/thirdSemis/fifthSemis/durBeats/amp/tone/width`;
+spark data: `midi/durBeats/amp/tone/width`; percussion data:
+`sample/amp/hp/width` using existing licensed one-shots. All lanes share the
+existing step bundle. Supporting layers complement the foreground bass,
+retain one clean sub, and stay absent in the pre-drop instrumental cut.
+
+The earlier 2026-10-11 rework added an original seeded rave/brass hook, six composed
 two-bar bass cells, sparse `bbScreech` replies, and `bbBassSample` substitutions
 using bundled CC0 growl/reese chops. `bass.scd` still returns the existing
 `bbSub`/`bbGrowl` Array; `main.scd` explicitly registers each new small module.

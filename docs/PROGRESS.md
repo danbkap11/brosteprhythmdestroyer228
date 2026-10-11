@@ -1,6 +1,55 @@
 # Progress
 
-## Current rework — 2026-10-11
+## Seeded arrangement and layers — current, 2026-10-11
+
+28 bars / 48 seconds at 140 BPM, still 4/4 halftime. First drop starts at
+6.86 s, four-bar break at 20.57 s, second drop at 34.29 s. The seed now shapes
+an ancestral motif, bounded onset/length/split/rest edits, harmonic journeys,
+phrase mutations, kick replies and fills. Stable motif anchors and the
+existing foreground bass synthesis preserve the theme/drop character.
+
+The break develops release → harmonic answer → quiet arpeggio → rhythmic
+pickup, followed by a four-bar build. New finite `bbAtmosphere` and `bbSpark`
+voices add a high-passed chord bed and metallic pluck/echo counterline;
+existing licensed one-shots supply a sparse additional percussion lane.
+Optional pad/spark/perc plan data shares the existing step bundle, source
+group and mix bus. There are no extra clocks, samples or persistent FX nodes.
+GUI transport/macros remain unchanged. References added to README.md:
+Ableton's Mutation Over Generations/Dramatic Arc and MusicRadar arranging tips.
+
+Actual Linux SC 3.13.0 compatibility checks:
+
+- All source modules compile; the two new SynthDefs serialize and execute.
+- Two independent eight-seed probes passed same-seed repeatability,
+  448-event timing/sections, distinct bass onset/melody signatures, backbeat
+  anchors and two clear instrumental gaps. One also checked zero main-bass
+  overlap or crossing of a later kick, and support parameter bounds.
+- Eight support-voice fixtures plus live control updates passed finite,
+  nonzero output, width-zero equality, early release and silent tails;
+  maximum raw peak 0.08330.
+- Full seed 228 and 12345 NRT renders passed: stereo 48 kHz, about 50.20 s
+  including tail, finite/nonzero, protected peak 0.340813, zero server errors.
+  Seed 228 section LUFS: build -21.0/-22.0, drops -18.0/-18.2, break -23.2.
+  These measurements establish level relationships, not listening quality.
+- Actual dummy-JACK regression passed playback through the first drop,
+  macro/BPM updates, Stop with an empty source group, restart and shutdown
+  preserving the external server and unrelated sentinel nodes. Actual
+  offscreen Qt launch/re-evaluation/Play/Stop/window-close also passed without
+  duplicate resources. The final render's last 50 ms is exactly silent;
+  natural sample/FX tails precede the render's end-of-score cleanup.
+- The isolated pad stem is nonzero in the break (RMS 0.01354), roughly 11 dB
+  below the full break: a supporting layer rather than a competing lead.
+  Measured 25–90 Hz drop RMS did not increase versus the prior render.
+
+Session artifacts use `/tmp/balkan-render/seed-variation-full*` and
+`seed-variation-12345*`; new support fixtures are `/tmp/balkan-support.wav`
+and `/tmp/balkan-support-live.wav`; current runtime logs are
+`seed-variation-lifecycle.log` and `seed-variation-launcher.log`.
+No formal runners were added to the repo.
+Target macOS SC 3.14.1, physical listening and subjective quality remain
+unverified here. The prior runtime results below are historical evidence.
+
+## Prior rework — 2026-10-11
 
 140 BPM, 4/4 halftime, 16 sixteenth steps/bar, 24 bars (~41.14 s).
 Original seeded rave hook and six composed two-bar bass cells; sustained
