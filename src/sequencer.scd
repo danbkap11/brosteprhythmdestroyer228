@@ -145,9 +145,11 @@
                     if (isDrop) {
                         kick = step == 0 or: {
                             (step == cellKicks[cell]) and: {
-                                ((bar % 2) == 1) and: {
-                                    1.0.rand < (0.40 + (app[\density] * 0.60))
-                                }
+                                1.0.rand < (if ((bar % 2) == 1, {
+                                    0.70 + (app[\density] * 0.20)
+                                }, {
+                                    0.25 + (app[\density] * 0.50)
+                                }))
                             }
                         };
                         snare = step == 8;
@@ -366,10 +368,12 @@
                                 sample.value(\reverseCrash, 0.19, 180, 0.45);
                             };
                             if (event[\shout]) {
-                                Synth.tail(source, \bbShout, [
-                                    \out, out, \amp, 0.28,
-                                    \dur, 0.84 / app[\clock].tempo
-                                ]);
+                                if (sample.value(\vocalShout, 0.29, 100, 0.16).not) {
+                                    Synth.tail(source, \bbShout, [
+                                        \out, out, \amp, 0.28,
+                                        \dur, 0.84 / app[\clock].tempo
+                                    ]);
+                                };
                             };
                             if (event[\impact]) {
                                 Synth.tail(source, \bbImpact, [
@@ -390,26 +394,41 @@
                                 sample.value(event[\snareSample],
                                     if (isDrop, { 0.25 }, { 0.08 }), 110);
                                 if (isDrop) {
-                                    sample.value(\clap,
-                                        if (event[\section] == \dropB, {
-                                            0.14
-                                        }, { 0.10 }), 350);
+                                    sample.value(\hardClap, 0.13, 700, 0.28);
+                                    sample.value(\trapSnare, 0.08, 550, 0.12);
+                                    if (event[\section] == \dropB) {
+                                        sample.value(\clap, 0.06, 450);
+                                    };
                                 };
                             };
                             if (event[\hat]) {
+                                var playedHat = false;
                                 if (isDrop) {
-                                    if (sample.value(\closedHat, 0.065, 1800, 0.32).not) {
-                                        hat.value;
+                                    if ((event[\step] % 2) == 1) {
+                                        playedHat = sample.value(
+                                            \tightHat, 0.075, 1500, 0.30);
+                                    };
+                                    if (playedHat.not) {
+                                        if (sample.value(\closedHat, 0.065, 1500, 0.32).not) {
+                                            hat.value;
+                                        };
                                     };
                                 } {
                                     hat.value;
                                 };
                             };
                             if (event[\openHat]) {
-                                if (sample.value(\openHat, 0.09, 1300, 0.40).not) {
-                                    Synth.tail(source, \bbOpenHat, [
-                                        \out, out, \amp, 0.07
-                                    ]);
+                                var playedOpenHat = false;
+                                if ((event[\bar] % 4) == 0) {
+                                    playedOpenHat = sample.value(
+                                        \longOpenHat, 0.065, 1500, 0.28);
+                                };
+                                if (playedOpenHat.not) {
+                                    if (sample.value(\openHat, 0.09, 1300, 0.40).not) {
+                                        Synth.tail(source, \bbOpenHat, [
+                                            \out, out, \amp, 0.07
+                                        ]);
+                                    };
                                 };
                             };
                             if (event[\tom].notNil) {

@@ -1,6 +1,6 @@
 # BALKAN//BASS
 
-A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, sustained distorted FM/growl, talking and vowel basses, a punchy accent bass, tempo-locked wobble on selected drop hits, and a clean mono sub. A quiet high-passed harmonic layer reinforces selected bass hits; layered CC0 drum/FX one-shots and shared master compression add weight. The original root-led bass riff is restored. One or both buildups end with a one-beat pause and an original, synthetic voice-like shout before the drop. Its seeded 24-bar loop moves through intro (2 bars), build (2), drop A (8), break (2), build (2), and drop B (8). At 140 BPM it lasts about **41.14 seconds**.
+A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, sustained distorted FM/growl, talking and vowel basses, a punchy accent bass, tempo-locked wobble on selected drop hits, and a clean mono sub. A quiet high-passed harmonic layer reinforces selected bass hits; layered CC0 drum/FX one-shots and shared master compression add weight. The root-led bass riff remains. One or both buildups end with a one-beat pause and a CC0 vocal shout before the drop. Its seeded 24-bar loop moves through intro (2 bars), build (2), drop A (8), break (2), build (2), and drop B (8). At 140 BPM it lasts about **41.14 seconds**.
 
 ## Get it running on macOS
 
@@ -11,6 +11,6 @@ A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, sustained distorted
 
 Drop A starts after about **6.86 seconds**; Drop B starts after about **27.43 seconds**. The selected pre-drop shout is near the end of the buildup immediately before one of those drops. Press **Stop** before changing the seed, density, variation or preset. Enter a seed and click **Generate** to make a new plan; **Play** restarts it from bar one. The same seed and controls select the same planned events, though synthesized noise may differ between plays. The six bass sliders affect new notes, and tempo changes take effect at the next bar. Closing the window releases this app's audio resources.
 
-The project includes [CC0 sample credits](assets/samples/README.md). These are licensed one-shots and original synth sounds, not samples from a commercial artist's recordings.
+The project includes [CC0 sample credits](assets/samples/README.md). These are licensed one-shots and original synth sounds, not samples from a commercial artist's recordings. The mix changes draw on [Sound On Sound's dubstep bass guide](https://www.soundonsound.com/techniques/dubstep-secrets) and [EDM Templates' drop-mixing checklist](https://edmtemplates.net/blogs/edm-templates-blog/how-to-mix-a-dubstep-drop): synchronized filter movement, parallel distortion/compression, a dedicated mono sub, and transient-focused drum layers.
 
 If startup fails, copy the **first** error and nearby stack trace from SuperCollider's Post Window, plus your macOS and SuperCollider versions. This cloud workspace has no `sclang` or `scsynth`; the latest revision has had source and asset checks here, but not a macOS compilation, playback or listening check.

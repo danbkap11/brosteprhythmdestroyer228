@@ -1,4 +1,4 @@
-// Original vowel-like pre-drop call; no recording or speech sample is required.
+// Original vowel-like fallback if the optional CC0 vocal sample is unavailable.
 SynthDef(\bbShout, { |out = 0, amp = 0.25, dur = 0.36|
     var safeDur = dur.clip(0.18, 0.6);
     var env = EnvGen.kr(

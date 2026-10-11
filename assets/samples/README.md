@@ -1,6 +1,6 @@
 # Included one-shots
 
-These are short, **CC0 1.0** samples from
+The original one-shots are **CC0 1.0** samples from
 [Kringel samples](https://github.com/Gradigang-Solutions/kringel-samples)
 at commit `60810ece266e94fdf1c91330a088ba3efb94041f`. They were converted to
 mono 44.1 kHz, 16-bit PCM WAV with FFmpeg for simple SuperCollider loading.
@@ -33,3 +33,22 @@ packs are included.
 These are one-shot accents layered with the existing synthesized drums and
 bass. The source collection is a practical licensed palette, not a claim that
 these individual files were used in any particular 2012 track.
+
+## Added transient and vocal one-shots
+
+`hard_clap.wav`, `trap_snare.wav`, `tight_hat.wav`, and `long_open_hat.wav`
+come from [Boochi44/free-drum-samples](https://github.com/Boochi44/free-drum-samples)
+at commit `77ba31428a079dd8f17c8e144c1e649ea0a198b3`. Its README states that
+all samples are CC0 1.0. The upstream files, respectively, are
+`drum-samples/01-hard-trap/claps/clap-01.wav`,
+`snares/hard-snare-01.wav`, `hi-hats/hi-hat-closed-01.wav`, and
+`open-hats/open-hat-01.wav` under the same `01-hard-trap` folder. The local
+versions were high-passed, trimmed, and faded to keep their transients short.
+
+`vocal_shout.wav` is derived from the high-quality preview of
+[“male_shout_01.wav” by slamaxu on Freesound](https://freesound.org/people/slamaxu/sounds/509885/),
+which its sound page labels **Creative Commons 0**. The audible phrase was
+trimmed from the preview, high-passed, faded and saved as mono 44.1 kHz PCM.
+The app uses this original shout near one or both drops; its synthesized
+`bbShout` remains a fallback if the file is missing. No commercial vocal or
+artist recording is included.
