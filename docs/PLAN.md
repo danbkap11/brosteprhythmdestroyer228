@@ -13,6 +13,26 @@ iteration; no external download is required. Export and formal tests remain
 deferred. Sections below this Quick MVP note describe historical planning,
 including a superseded 7/8 version.
 
+Latest listening revision: **Arabic/Hijaz-inspired brostep**, replacing the
+earlier Balkan/pentatonic theme. The equal-tempered collection is
+`[0,1,4,5,7,8,10]`, with tonic/b2/major-third/fourth gestures and cadences.
+Seeded tonic/bII/IV accompaniment stays in that collection. The GUI reads
+HIJAZ//BASS; repository/module names and the `~balkan` API remain compatible.
+This is an electronic adaptation, not a claim of traditional maqam intonation.
+
+`bbRave` retains its controls/name but replaces bright brass oscillators with
+a rounded native Pluck/reed hybrid, bounded low-pass and final 220 Hz high-pass.
+Its maximum finite duration is 1.25 s; early gate release is 45 ms. Melodic
+event levels and counterline register are reduced. The atmosphere attack is
+25 ms so the break downbeat begins promptly; hook/pad/percussion/sub-pulse
+activity starts at the break entrance. Pre-drop vocal cuts remain intentional.
+
+Upper bass has fuller parallel body/formant support, slightly stronger bounded
+saturation and higher finite sustain. Foreground mid notes may sustain across
+kicks under existing ducking; clean sub durations still end before a later
+kick and main bass notes end before the next main note. Sub synthesis, master
+peak/gain limits, routing, timing, GUI macros and cleanup are preserved.
+
 The subsequent seed/arrangement iteration preserves the drop synthesis but
 generates a seed-specific ancestral motif and mutates its onsets, lengths,
 endings and register across phrases. Stable anchors keep thematic identity;

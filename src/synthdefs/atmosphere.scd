@@ -4,7 +4,7 @@ SynthDef(\bbAtmosphere, { |out = 0, freq = 146.83, amp = 0.09, dur = 3.4,
     width = 0.42, thirdSemis = 3, fifthSemis = 7|
     var safeDur = dur.clip(0.4, 4.5);
     var env = EnvGen.ar(Env([0, 1, 0.88, 0],
-        [0.12, safeDur - 0.36, 0.24], [3, -1, -4]), doneAction: 2);
+        [0.025, safeDur - 0.265, 0.24], [-2, -1, -4]), doneAction: 2);
     var release = EnvGen.ar(Env.asr(0.01, 1, 0.18, -4),
         gate.clip(0, 1), doneAction: 2);
     var hz = Lag.kr(freq.clip(100, 800), 0.025);

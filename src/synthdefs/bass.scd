@@ -26,7 +26,7 @@
         var safeAttack = attack.clip(0.003, 0.02);
         var tail = (safeDur * 0.16).clip(0.018, 0.12);
         var ampEnv = EnvGen.ar(
-            Env([0, 1, 0.88, 0],
+            Env([0, 1, 0.94, 0],
                 [safeAttack, (safeDur - safeAttack - tail).max(0.005), tail],
                 [-4, 0, -4]), doneAction: 2
         );
@@ -95,8 +95,9 @@
                 * 0.85) + (BPF.ar(shaped,
             ((1400 + ((1 - motion) * 950)) * toneRatio).clip(800, 4400),
             0.35) * 0.60);
-        var mid = LeakDC.ar(((filtered * 1.30) + (throat * 1.35)
-            + (shaped * 0.23)).tanh);
+        // Keep the moving formants while filling the body between their peaks.
+        var mid = LeakDC.ar(((filtered * 1.30) + (throat * 1.50)
+            + (shaped * 0.35)).tanh);
         var side = LeakDC.ar((sawL - sawR) * 0.5 * textureCtl);
         var wideSide = HPF.ar(HPF.ar(side, 180), 180) * (0.35 * widthCtl);
         var stereo = [mid + wideSide, mid - wideSide];
@@ -105,11 +106,11 @@
         var compressed = Compander.ar(output, output, 0.28,
             1, 0.65, 0.006, 0.09);
         var protected = HPF.ar(HPF.ar(
-            LeakDC.ar((compressed * 2.6).tanh), 115), 115);
+            LeakDC.ar((compressed * 2.8).tanh), 115), 115);
         var wobbleGain = 1 - (0.35 * movementCtl *
             motionLoop.clip(0, 1) * (1 - motion));
         var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
-        Out.ar(out, protected * wobbleGain *
+        Out.ar(out, protected * 1.15 * wobbleGain *
             ampEnv * gateEnv * ampCtl * duck.linlin(0, 1, 0.35, 1));
     })
 ]

@@ -7,21 +7,22 @@
             // [sixteenth onset, maximum length, local interval, character]
             var rhythmBank = [
                 [ [[0,7,0,\growl],[10,2,0,\yoi],[13,2,7,\accent]],
-                    [[0,2,0,\accent],[3,2,0,\yoi],[6,1,3,\talk],[10,3,0,\growl],[14,1,7,\rave]] ],
+                    [[0,2,0,\accent],[3,2,0,\yoi],[6,1,4,\talk],[10,3,0,\growl],[14,1,7,\rave]] ],
                 [ [[0,3,0,\accent],[4,3,0,\growl],[10,5,0,\growl]],
                     [[1,2,0,\yoi],[4,3,0,\growl],[10,2,7,\accent],[13,2,0,\rave]] ],
-                [ [[0,6,0,\growl],[10,2,3,\yoi],[13,1,0,\accent],[15,1,7,\yoi]],
+                [ [[0,6,0,\growl],[10,2,4,\yoi],[13,1,0,\accent],[15,1,7,\yoi]],
                     [[0,2,0,\accent],[3,4,0,\growl],[10,4,0,\screech],[15,1,0,\rave]] ],
                 [ [[0,2,0,\accent],[3,2,0,\yoi],[6,1,0,\accent],[10,5,0,\growl]],
-                    [[0,7,0,\growl],[10,2,7,\yoi],[13,2,3,\rave]] ],
+                    [[0,7,0,\growl],[10,2,7,\yoi],[13,2,4,\rave]] ],
                 [ [[0,7,0,\growl],[10,3,7,\screech],[14,1,0,\accent]],
                     [[0,2,0,\accent],[4,3,0,\talk],[10,2,0,\yoi],[13,2,7,\rave]] ]
             ];
             var hookGrids = [ [[0,3,6,11],[2,6,12]], [[0,4,10],[1,5,10,14]],
                 [[0,3,7,12],[2,5,13]], [[0,5,10],[2,6,11,15]] ];
-            var journeys = [ [0,0,8,8,3,3,0,0], [0,0,3,3,10,10,0,0],
-                [0,0,10,10,8,8,0,0], [0,0,8,8,10,10,0,0] ];
-            var minorScale = [0,3,5,7,10,12];
+            var journeys = [ [0,0,1,1,5,5,0,0], [0,0,5,5,1,1,0,0],
+                [0,0,1,1,0,0,5,0], [0,0,5,5,0,0,1,0] ];
+            // Equal-tempered Hijaz color: b2 -> major third is the signature leap.
+            var hijazScale = [0,1,4,5,7,8,10,12];
             var tonic;
             var theme;
             var hookGrid;
@@ -37,17 +38,24 @@
             var voiceReply;
             var mutation;
             var mutateCell;
-            var buildHook;
+            var quantizeMidi;
 
             thisThread.randSeed = app[\seed];
             tonic = [26,29,31].choose;
-            // Root, fifth and minor third identify the motif; its continuation is seeded.
-            theme = [0,7,3] ++ [5,10,12].scramble ++ [0];
+            // Tonic, b2, major third and fourth identify the motif; its answer is seeded.
+            theme = [0,1,4,5] ++ [7,8,10,12].scramble ++ [0];
+            quantizeMidi = { |midi|
+                var octave = (((midi - tonic) / 12).floor * 12).asInteger;
+                hijazScale.collect { |interval| tonic + octave + interval }
+                    .minItem { |candidate| (candidate - midi).abs };
+            };
             hookGrid = hookGrids.choose;
             hook = Array.fill(2, { |half|
                 hookGrid[half].collect { |step,index|
                     var themeIndex = if (half == 0, { index }, { index + hookGrid[0].size });
-                    [step, theme[themeIndex % theme.size], [2,3].choose]
+                    [step, if (half == 1 and: { index == (hookGrid[half].size - 1) }, {
+                        0 // Every two-bar answer returns to the tonic.
+                    }, { theme[themeIndex % theme.size] }), [2,3].choose]
                 }
             });
             mutation = (0.35 + (app[\variation] * 0.55)).clip(0.35,0.9);
@@ -61,7 +69,7 @@
                                 (note[0] + [-2,-1,1,2].choose).clip(2,6)
                             }, { (note[0] + [-2,-1,1,2].choose).clip(10,15) });
                             note[1] = (note[1] + [-1,1,2].choose).clip(1,7);
-                            note[2] = [0,3,7,10].choose;
+                            note[2] = [0,1,4,7,8,10].choose;
                         };
                         note
                     };
@@ -117,7 +125,7 @@
                 var isFinalBuild;
                 var root = tonic;
                 var chordOffset = 0;
-                var chordMajor = false;
+                var chordThird = 4;
                 var notes = [];
                 var hookNotes = [];
                 var phraseEnd;
@@ -168,9 +176,9 @@
                     };
                     hookNotes = hook[sectionBar % 2];
                     if (section == \breakdown and: { sectionBar == 1 }) {
-                        // Tonal inversion inside the same pentatonic collection, lower register.
+                        // Tonal inversion inside the Hijaz collection, in a lower register.
                         hookNotes = hookNotes.collect { |item|
-                            [item[0], minorScale[5 - minorScale.indexOf(item[1])], item[2]]
+                            [item[0], hijazScale[7 - hijazScale.indexOf(item[1])], item[2]]
                         };
                     };
                     if (section == \breakdown and: { sectionBar == 2 }) { hookNotes = [] };
@@ -185,7 +193,8 @@
                         });
                     };
                 };
-                chordMajor = chordOffset != 0;
+                // Tonic major, bII major and IV minor all use notes in the mode.
+                chordThird = if (chordOffset == 5, { 3 }, { 4 });
                 root = tonic + chordOffset;
                 while { root > 34 } { root = root - 12 };
                 while { root < 24 } { root = root + 12 };
@@ -195,7 +204,7 @@
                 fillSample = [\tomHigh,\tomMid,\glitch].choose;
                 if (section == \breakdown) {
                     sparkSteps = if (sectionBar == 2,{[1,5,9,13]}, {
-                        if (sectionBar >= 1,{[5,13]},{[13]})
+                        if (sectionBar >= 1,{[5,13]},{[0,5,13]})
                     });
                     percSteps = if (sectionBar >= 2,{[3,11,15]},{[11]});
                 };
@@ -239,7 +248,7 @@
                     var isLong;
                     var nextKick;
                     var nextBass;
-                    var localIntervals = if (chordMajor,{[0,4,7,12]},{[0,3,7,10]});
+                    var localIntervals = [0,chordThird,7,12];
 
                     if (section == \intro) {
                         snare = (step == 8) and: { sectionBar == 1 };
@@ -247,8 +256,13 @@
                         if (sectionBar == 1 and: { step == 10 }) { note = [10,3,0,\talk] };
                     };
                     if (section == \breakdown) {
-                        // Release -> harmonic answer -> quiet arp -> rhythmic pickup.
-                        hat = if (sectionBar < 2,{[2,10].includes(step)}, {
+                        // The release opens with a hook/pad and gentle rhythmic/sub pickup.
+                        if (sectionBar == 0 and: { step == 0 }) { tom = \tomLow };
+                        if (sectionBar == 0 and: { [0,8].includes(step) }) {
+                            subMidi = root;
+                            subDurBeats = if (step == 0, { 0.72 }, { 0.42 });
+                        };
+                        hat = if (sectionBar < 2,{[0,2,10].includes(step)}, {
                             if (sectionBar == 2,{[2,6,10,14].includes(step)},{(step % 2) == 0})
                         });
                         hatAmp = [0.022,0.025,0.035,0.043][sectionBar];
@@ -295,8 +309,8 @@
                             durBeats: if (section == \breakdown, {
                                 [0.8,1.3,1.8].choose
                             },{hookNote[2] * config[\stepBeats] * 0.82}),
-                            amp: if (section == \breakdown,{0.105},{if (isBuild,{0.12},{0.13})}),
-                            tone: if (section == \breakdown,{0.24},{if (isBuild,{0.42},{0.55})}),
+                            amp: if (section == \breakdown,{0.08},{if (isBuild,{0.09},{0.098})}),
+                            tone: if (section == \breakdown,{0.18},{if (isBuild,{0.28},{0.32})}),
                             width: if (section == \breakdown,{0.35},{0.24})
                         );
                         // Extended break notes stop before the next motif attack.
@@ -307,12 +321,12 @@
                     };
                     if (note.notNil) {
                         role = note[3]; offset = note[2];
-                        if (chordMajor and: { offset == 3 }) { offset = 4 };
+                        if (offset == 3) { offset = chordThird };
                         if (role == \rave) {
                             lead = (
                                 midi: tonic + 36 + theme[(cellIndex + step) % theme.size],
                                 durBeats: note[1] * config[\stepBeats] * 0.78,
-                                amp: 0.12, tone: 0.55, width: 0.24
+                                amp: 0.09, tone: 0.35, width: 0.24
                             );
                             subMidi = root;
                             subDurBeats = note[1] * config[\stepBeats] * 0.72;
@@ -330,14 +344,13 @@
                             };
                             bassDur = note[1] * config[\stepBeats] * if (isLong,{0.97},{0.78});
                             nextBass = notes.detect { |item| item[0] > step };
-                            nextKick = kickSteps.detect { |onset| onset > step };
                             if (nextBass.notNil) { bassDur = bassDur.min(((nextBass[0] - step) * 0.25) - 0.02) };
-                            if (nextKick.notNil) { bassDur = bassDur.min(((nextKick - step) * 0.25) - 0.025) };
+                            // Midrange sustain may cross a kick; server ducking clears its attack.
                             bassDur = bassDur.max(0.08);
                             bass = (
                                 synth: synth,
-                                midi: root + 12 + offset + if (synth == \bbScreech,{12},{0}),
-                                amp: if (isDrop,{if (step == 0,{0.30},{0.27})},{0.14}),
+                                midi: quantizeMidi.value(root + 12 + offset + if (synth == \bbScreech,{12},{0})),
+                                amp: if (isDrop,{if (step == 0,{0.32},{0.30})},{0.14}),
                                 durBeats: bassDur, topLayer: false,
                                 sample: if (isDrop and: { step == notes[0][0] } and: {
                                     (sectionBar % 4) == 0
@@ -363,25 +376,31 @@
                     };
                     // Each supporting lane has a register and a quiet, sparse purpose.
                     if (step == 0 and: {
-                        (section == \breakdown) or: { isBuild and: { (sectionBar % 2) == 0 } } or: {
+                        (section == \breakdown) or: { section == \intro and: { sectionBar == 0 } } or: {
+                            isBuild and: { (sectionBar % 2) == 0 }
+                        } or: {
                             isDrop and: { (sectionBar % 4) == 0 }
                         }
                     }) {
                         pad = (
-                            midi: padMidi, thirdSemis: if (chordMajor,{4},{3}), fifthSemis: 7,
-                            durBeats: if (section == \breakdown,{3.65},{if (isDrop,{6.6},{7.0})}),
-                            amp: if (isDrop,{0.04},{if (isBuild,{0.055},{0.075})}),
+                            midi: padMidi, thirdSemis: chordThird, fifthSemis: 7,
+                            durBeats: if (section == \intro,{3.7},{
+                                if (section == \breakdown,{3.65},{if (isDrop,{6.6},{7.0})})
+                            }),
+                            amp: if (isDrop,{0.04},{
+                                if (isBuild,{0.055},{if (section == \intro,{0.05},{0.075})})
+                            }),
                             tone: if (isDrop,{0.46},{0.28}), width: 0.42
                         );
                     };
                     if (sparkSteps.includes(step)) {
-                        var sparkMidi = tonic + 48 + theme[(step.div(4) + sectionBar) % theme.size];
+                        var sparkMidi = tonic + 36 + theme[(step.div(4) + sectionBar) % theme.size];
                         if (sparkMidi > 84) { sparkMidi = sparkMidi - 12 };
                         spark = (
                             midi: sparkMidi,
                             durBeats: if (section == \breakdown,{0.62},{0.32}),
-                            amp: if (isDrop,{0.04},{if (section == \breakdown,{0.06},{0.047})}),
-                            tone: if (section == \breakdown,{0.25},{0.48}), width: 0.38
+                            amp: if (isDrop,{0.035},{if (section == \breakdown,{0.042},{0.04})}),
+                            tone: if (section == \breakdown,{0.18},{0.32}), width: 0.38
                         );
                     };
                     if (percSteps.includes(step)) {

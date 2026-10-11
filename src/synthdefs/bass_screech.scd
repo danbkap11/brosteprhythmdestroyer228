@@ -8,7 +8,7 @@ SynthDef(\bbScreech, { |out = 0, freq = 73.42, amp = 0.24, dur = 0.3,
     motionEnd = 0.1, riseFrac = 0.1, duckBus = -1|
     var safeDur = dur.clip(0.06, 1.15);
     var tail = (safeDur * 0.16).clip(0.015, 0.10);
-    var env = EnvGen.ar(Env([0, 1, 0.86, 0],
+    var env = EnvGen.ar(Env([0, 1, 0.92, 0],
         [attack.clip(0.002, 0.02),
             (safeDur - attack.clip(0.002, 0.02) - tail).max(0.005), tail],
         [-4, 0, -4]), doneAction: 2);
@@ -43,12 +43,12 @@ SynthDef(\bbScreech, { |out = 0, freq = 73.42, amp = 0.24, dur = 0.3,
     var shaped = (raw * (2 + (driveCtl * 6))).tanh;
     var nasal = BPF.ar(shaped,
         ((900 + (motion * 2400)) * (0.75 + toneCtl)).clip(650, 4800), 0.28);
-    var center = ((shaped * 0.55) + (nasal * 1.65)).tanh;
+    var center = ((shaped * 0.62) + (nasal * 1.65)).tanh;
     var side = HPF.ar(Saw.ar(hz * 2.01) - Saw.ar(hz * 1.99), 600)
         * widthCtl * textureCtl * 0.09;
     var output = LPF.ar(HPF.ar(HPF.ar(LeakDC.ar(
         [center + side, center - side]), 180), 180), cutoff.clip(1600, 8000));
     var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
-    Out.ar(out, output * env * gateEnv * amp.clip(0, 0.30)
+    Out.ar(out, output * 1.10 * env * gateEnv * amp.clip(0, 0.30)
         * duck.linlin(0, 1, 0.35, 1));
 })

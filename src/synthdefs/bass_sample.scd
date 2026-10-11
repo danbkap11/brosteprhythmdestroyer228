@@ -9,7 +9,7 @@ SynthDef(\bbBassSample, { |out = 0, bufnum = 0, rootFreq = 82.41,
     motionEnd = 0.15, riseFrac = 0.15|
     var safeDur = dur.clip(0.06, 1.5);
     var tail = (safeDur * 0.15).clip(0.012, 0.09);
-    var env = EnvGen.ar(Env([0, 1, 0.9, 0],
+    var env = EnvGen.ar(Env([0, 1, 0.94, 0],
         [attack.clip(0.002, 0.02),
             (safeDur - attack.clip(0.002, 0.02) - tail).max(0.005), tail],
         [-4, 0, -4]), doneAction: 2);
@@ -45,12 +45,12 @@ SynthDef(\bbBassSample, { |out = 0, bufnum = 0, rootFreq = 82.41,
         * (2 ** (((motion * 2) - 1) * moveCtl))).clip(650, 8000);
     var filtered = RLPF.ar(base, movingCutoff, 0.65);
     var vowel = BPF.ar(base, 650 + (motion * 1400), 0.4) * growlCtl * 0.5;
-    var center = (((filtered * 1.1) + vowel) * 1.4).tanh;
+    var center = (((filtered * 1.1) + vowel) * 1.55).tanh;
     var high = HPF.ar(center, 900);
     var side = (DelayC.ar(high, 0.01, 0.004) - high) * widthCtl * 0.15;
     var upper = LPF.ar(HPF.ar(HPF.ar(LeakDC.ar(
         [center + side, center - side]), 115), 115), 8000);
     var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
-    Out.ar(out, upper * env * gateEnv * amp.clip(0, 0.32)
+    Out.ar(out, upper * 1.15 * env * gateEnv * amp.clip(0, 0.32)
         * duck.linlin(0, 1, 0.35, 1));
 })

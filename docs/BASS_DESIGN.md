@@ -20,6 +20,17 @@ the mono sub retains its 90 Hz low-pass, old decay argument and optional finite
 `dur`/early `gate`. Optional kick `duckBus = -1` means no ducking when used solo.
 It affects amplitude only, not note timing or DSP topology.
 
+Latest listening calibration adds bounded parallel body/formant support and
+higher finite sustain, with measured same-note RMS increases of about
+1.8–3.7 dB across the existing mids. Fast attacks and final high-passes stay
+intact; the clean sub is unchanged. Main mid calls can sustain across kicks
+under the existing duck contour, while sub is still cut before later kicks.
+Default solo fixtures peak below 0.433; selected extreme clipped controls
+reach 0.660 before master protection. The older 0.50 acceptance target below
+is historical guidance, not a pass claimed for all current corner settings.
+The accompanying hook keeps the `bbRave` interface but now uses a rounded
+plucked/reed graph, and event pitches follow the current Hijaz-inspired mode.
+
 Routing and current exceptions are recorded in PLAN.md's Quick MVP scope.
 Current modules actually compile and render on a Linux SC 3.13.0 compatibility
 runtime; endpoints, live changes, release and mono fixtures passed. This does

@@ -4,7 +4,7 @@
             app[\window].front;
         } {
             var window = Window(
-                "BALKAN//BASS",
+                "HIJAZ//BASS",
                 Rect(120, 120, 700, 590)
             );
             var playButton = Button(window, Rect(20, 18, 100, 32))
@@ -163,7 +163,7 @@
             defaultsButton = Button(window, Rect(262, 542, 110, 30))
                 .states_([["Defaults"]]);
             StaticText(window, Rect(390, 542, 290, 30))
-                .string_("4/4 · halftime · 28-bar build/drop");
+                .string_("Hijaz · 4/4 · 28-bar build/drop");
 
             playButton.action_({ app[\start].value });
             stopButton.action_({ app[\stop].value });

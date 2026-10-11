@@ -1,6 +1,57 @@
 # Progress
 
-## Seeded arrangement and layers — current, 2026-10-11
+## Hijaz direction, rounder lead and bass presence — current, 2026-10-11
+
+28-bar / 48-second groove and seed controls preserved. Arabic/Hijaz-inspired
+equal-tempered motifs replace the pentatonic direction: `[0,1,4,5,7,8,10]`,
+tonic/b2/major-third/fourth gestures, tonic cadences and compatible tonic/bII/IV
+accompaniment. MaqamWorld source links are in README.md. GUI title is
+HIJAZ//BASS; repository names and `~balkan` remain compatible.
+
+`bbRave` now uses a rounded Pluck/reed hybrid rather than the former bright
+brass stack; its old name/control interface is retained. Note levels and
+counterline register are reduced. Break opening immediately triggers hook,
+pad, spark, light tom/hat and a clean sub pulse; atmosphere attack is 25 ms.
+Intentional vocal gaps before drops remain intact.
+
+Six upper-bass voices have fuller parallel body/formant support, slightly
+stronger bounded saturation and higher finite sustain. Foreground mid calls
+can cross kicks under existing ducking, ending before the next main note;
+sub still ends before later kicks. Sub SynthDef and master ceiling unchanged.
+
+Actual SC 3.13.0 Linux compatibility results:
+
+- All 22 source modules compile and SynthDefs serialize.
+- Eight seeds pass 448-event timing, identical regeneration, Hijaz membership
+  across pitched lanes/pad triads, active break downbeat, and distinct
+  rhythm/melody signatures.
+- 42 upper-bass fixtures pass short/max notes, endpoints, live changes,
+  gate release, ducking, finite audio, width-zero mono and automatic node
+  removal. Same-note active RMS rises 1.8–3.7 dB; 300–2000 Hz energy rises
+  1.5–3.5 dB. Default fixture peaks <0.433; extreme clipped controls <0.660
+  before the protected master. Clean sub fixture is unchanged.
+- Seven replacement-lead fixtures pass finite/nonzero output, maximum
+  1.25-second lifetime, live changes, early release and width-zero equality.
+  Maximum raw peak 0.06146; its measured default RMS is lower than the old
+  lead, consistent with reducing its prominence.
+- Full seed 228 and 12345 NRT renders pass finite/nonzero stereo audio,
+  protected peak 0.340813, no server errors and an exactly silent final
+  50 ms. Seed 228 drops measure -18.2/-17.5 LUFS. Drop A's 350–1400 Hz
+  energy rises 1.30 dB versus the preserved prior render; its 25–90 Hz
+  band changes only -0.17 dB. The clean-sub stem has exact L/R equality.
+- The first 0.3 seconds of the break have continuous nonzero audio,
+  RMS 0.09858 and peak 0.19780: no empty entrance.
+- Dummy-JACK playback, live macros, next-bar tempo updates, Stop/restart
+  and shutdown pass while preserving an external server and unrelated
+  sentinel nodes. Offscreen Qt launch, re-evaluation and window close
+  pass without duplicate windows/audio graphs or retained owned resources.
+
+Temporary results: `/tmp/bb-presence-{before,after,bounds}.*` and the current
+`/tmp/balkan-render/hijaz-*` artifacts. Listening and macOS SC 3.14.1 remain
+unverified here. Earlier validation results are preserved below. No formal
+test infrastructure, plugins or application dependencies were added.
+
+## Prior seeded arrangement and layers — 2026-10-11
 
 28 bars / 48 seconds at 140 BPM, still 4/4 halftime. First drop starts at
 6.86 s, four-bar break at 20.57 s, second drop at 34.29 s. The seed now shapes

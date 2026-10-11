@@ -10,7 +10,7 @@ SynthDef(\bbAccent, { |out = 0, freq = 73.42, amp = 0.30, dur = 0.3,
     var rise = riseFrac.clip(0.05, 0.8);
     var tail = (safeDur * 0.16).clip(0.018, 0.11);
     var ampEnv = EnvGen.ar(
-        Env([0, 1, 0.90, 0],
+        Env([0, 1, 0.95, 0],
             [attack.clip(0.002, 0.02),
                 (safeDur - attack.clip(0.002, 0.02) - tail).max(0.005), tail],
             [-4, 0, -4]),
@@ -63,7 +63,7 @@ SynthDef(\bbAccent, { |out = 0, freq = 73.42, amp = 0.30, dur = 0.3,
     var vowels = BPF.ar(shaped, vowelOne.clip(350, 2600), 0.35) * 1.3 +
         BPF.ar(shaped, vowelTwo.clip(950, 3900), 0.4);
     var tick = HPF.ar(WhiteNoise.ar, 2400) * tickEnv * 0.16;
-    var center = ((shaped * 0.72) + (vowels * 2.2) + tick).tanh * 1.15;
+    var center = ((shaped * 0.80) + (vowels * 2.2) + tick).tanh * 1.15;
     var side = HPF.ar(sawLeft - sawRight, 250) *
         textureCtl * widthCtl * 0.08;
     var stereo = [center + side, center - side];
@@ -73,8 +73,8 @@ SynthDef(\bbAccent, { |out = 0, freq = 73.42, amp = 0.30, dur = 0.3,
     var compressed = Compander.ar(output, output, 0.28,
         1, 0.65, 0.006, 0.09);
     var protected = HPF.ar(HPF.ar(
-        LeakDC.ar((compressed * 1.4).tanh), 115), 115);
+        LeakDC.ar((compressed * 1.55).tanh), 115), 115);
     var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
-    Out.ar(out, protected * ampEnv * gateEnv *
+    Out.ar(out, protected * 1.10 * ampEnv * gateEnv *
         Lag.kr(amp.clip(0, 0.32), 0.01) * duck.linlin(0, 1, 0.35, 1));
 })

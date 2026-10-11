@@ -10,7 +10,7 @@ SynthDef(\bbTalking, { |out = 0, freq = 73.42, amp = 0.16, dur = 0.28,
     var rise = riseFrac.clip(0.05, 0.80);
     var tail = (safeDur * 0.16).clip(0.018, 0.10);
     var ampEnv = EnvGen.ar(
-        Env([0, 1, 0.88, 0],
+        Env([0, 1, 0.94, 0],
             [attack.clip(0.003, 0.02),
                 (safeDur - attack.clip(0.003, 0.02) - tail).max(0.005), tail],
             [-4, 0, -4]),
@@ -64,7 +64,8 @@ SynthDef(\bbTalking, { |out = 0, freq = 73.42, amp = 0.16, dur = 0.28,
     var vowels = (BPF.ar(shaped, formantOne, 0.30) * 0.55) +
         (BPF.ar(shaped, formantTwo, 0.27) * 0.47) +
         (BPF.ar(shaped, formantThree, 0.32) * 0.35);
-    var center = LeakDC.ar((shaped * 0.32) + (vowels * 1.4));
+    // Parallel body keeps vowel notches from making the answer disappear.
+    var center = LeakDC.ar((shaped * 0.40) + (vowels * 1.55));
     var side = HPF.ar(sawLeft - sawRight, 220) * textureCtl * widthCtl * 0.08;
     var stereo = [center + side, center - side];
     var upper = HPF.ar(HPF.ar(stereo, 115), 115);
@@ -72,10 +73,10 @@ SynthDef(\bbTalking, { |out = 0, freq = 73.42, amp = 0.16, dur = 0.28,
     var compressed = Compander.ar(output, output, 0.24,
         1, 0.65, 0.006, 0.09);
     var protected = HPF.ar(HPF.ar(
-        LeakDC.ar((compressed * 4.0).tanh), 115), 115);
+        LeakDC.ar((compressed * 4.5).tanh), 115), 115);
     var wobbleGain = 1 - (0.35 * movementCtl *
         motionLoop.clip(0, 1) * (1 - motion));
     var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
-    Out.ar(out, protected * wobbleGain * ampEnv * gateEnv *
+    Out.ar(out, protected * 1.15 * wobbleGain * ampEnv * gateEnv *
         Lag.kr(amp.clip(0, 0.30), 0.01) * duck.linlin(0, 1, 0.35, 1));
 })

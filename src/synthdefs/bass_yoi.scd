@@ -10,7 +10,7 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     var rise = riseFrac.clip(0.05, 0.8);
     var tail = (safeDur * 0.16).clip(0.018, 0.11);
     var ampEnv = EnvGen.ar(
-        Env([0, 1, 0.88, 0],
+        Env([0, 1, 0.94, 0],
             [attack.clip(0.003, 0.02),
                 (safeDur - attack.clip(0.003, 0.02) - tail).max(0.005), tail],
             [-4, 0, -4]),
@@ -58,7 +58,7 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     var highVowel = (2600 - (motion * 1050)) * toneRatio;
     var vowels = BPF.ar(distorted, lowVowel.clip(300, 2400), 0.32) * 1.2 +
         BPF.ar(distorted, highVowel.clip(900, 4000), 0.38);
-    var center = ((distorted * 0.40) + (vowels * 2.0)).tanh;
+    var center = ((distorted * 0.48) + (vowels * 2.1)).tanh;
     var side = HPF.ar(sawLeft - sawRight, 230) *
         textureCtl * widthCtl * 0.10;
     var stereo = [center + side, center - side];
@@ -67,10 +67,10 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     var compressed = Compander.ar(output, output, 0.26,
         1, 0.65, 0.006, 0.09);
     var protected = HPF.ar(HPF.ar(
-        LeakDC.ar((compressed * 2.4).tanh), 115), 115);
+        LeakDC.ar((compressed * 2.55).tanh), 115), 115);
     var wobbleGain = 1 - (0.35 * moveCtl *
         motionLoop.clip(0, 1) * (1 - motion));
     var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
-    Out.ar(out, protected * wobbleGain * ampEnv * gateEnv *
+    Out.ar(out, protected * 1.15 * wobbleGain * ampEnv * gateEnv *
         Lag.kr(amp.clip(0, 0.30), 0.01) * duck.linlin(0, 1, 0.35, 1));
 })
