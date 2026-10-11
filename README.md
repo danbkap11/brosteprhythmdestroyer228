@@ -44,7 +44,7 @@ second drop.
 While stopped, enter a **Seed** and click **Generate**, adjust **Density** and **Variation**, or
 choose **Destroyer** or **Reese Reply**. **Generate** rebuilds the 32-bar
 event plan from those settings. The same settings produce the same planned
-notes and drum hits, including the selected two-bar drop riffs, root order,
+notes and drum hits, including the opening bass rhythm, two-bar drop riffs, root order,
 drum accents and sample colors. A different seed should now make a more
 obvious change; rare seeds can still select similar combinations. **New Seed** chooses another seed. **Defaults** restores
 the starting controls. Both presets change the existing bass macro controls;

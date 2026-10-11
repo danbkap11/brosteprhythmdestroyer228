@@ -3,7 +3,8 @@
 Current source revision: CC0 one-shots layer the synthesized drop drums and
 transitions, with optional-sample fallback. Seeds now choose two-bar bass riffs,
 drop root orders, reply intervals, drum accents and sample snare colors; the
-GUI Generate action commits its displayed seed. The new code and sounds have
+opening bass rhythms, and the GUI Generate action commits its displayed seed.
+The new code and sounds have
 not been compiled, played or heard on macOS in this cloud workspace.
 
 The current target is the 32-bar, 140 BPM, 7/8 (2+2+3) brostep GUI arrangement described at the top of PLAN.md. It uses the existing native transport and controls, deterministic seeded events, a clean sub, and two factory character presets. Export and formal test infrastructure remain deferred.

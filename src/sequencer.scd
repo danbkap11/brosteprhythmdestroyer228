@@ -20,8 +20,12 @@
                 [[1, 2], [1, 5]],
                 [[2, 5, 6], [1, 5]]
             ];
+            var introRiffs = [[2], [5], [1, 5], [2, 6], [1, 2]];
+            var buildRiffs = [[2, 5], [1, 5], [2, 6], [1, 2, 5]];
             var rootOrder;
             var dropBRoots;
+            var introRiffIndex;
+            var buildRiffIndex;
             var cellRiffs;
             var cellVoices;
             var cellReplies;
@@ -31,6 +35,8 @@
             thisThread.randSeed = app[\seed];
             rootOrder = rootOrders.choose;
             dropBRoots = rootOrders.choose;
+            introRiffIndex = introRiffs.size.rand;
+            buildRiffIndex = buildRiffs.size.rand;
             cellRiffs = Array.fill(8, { riffPairs.choose });
             cellVoices = Array.fill(8, { 2.rand });
             cellReplies = Array.fill(8, { [0, 0, 7, 12].choose });
@@ -104,8 +110,13 @@
                     if (section == \intro) {
                         kick = (step == 0) or: { (bar > 1) and: { step == 3 } };
                         snare = step == 4;
-                        hat = [0, 2, 4].includes(step);
-                        bassHit = if ((bar % 2) == 0, { step == 2 }, { step == 5 });
+                        hat = if ((introRiffIndex % 2) == 0, {
+                            [0, 2, 4].includes(step)
+                        }, {
+                            [0, 1, 4, 6].includes(step)
+                        });
+                        bassHit = introRiffs[(introRiffIndex + bar.div(2)) %
+                            introRiffs.size].includes(step);
                     } {
                         if (isBuild) {
                             kick = [0, 3].includes(step);
@@ -116,8 +127,9 @@
                                         (app[\density] * 0.18))
                                 }
                             };
-                            bassHit = (step == 2) or: {
-                                (step == 5) and: { sectionBar < 3 }
+                            bassHit = buildRiffs[buildRiffIndex].includes(step);
+                            if (sectionBar == 3 and: { step == 6 }) {
+                                bassHit = false;
                             };
                             if ((sectionBar == 2) and: { step == 6 }) { roll = 1 };
                             if ((sectionBar == 3) and: { step == 5 }) { roll = 2 };
