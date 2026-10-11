@@ -26,6 +26,7 @@
         var attemptBus;
         var attemptGroup;
         var attemptMaster;
+        var attemptBuffers;
         var releaseAttempt;
 
         if (app[\state] == \ready or: { app[\state] == \playing }) {
@@ -42,11 +43,14 @@
                 attemptBus = nil;
                 attemptGroup = nil;
                 attemptMaster = nil;
+                attemptBuffers = Dictionary.new;
+                app[\sampleBuffers] = attemptBuffers;
                 releaseAttempt = {
                     if (server.serverRunning) {
                         attemptGroup.tryPerform(\freeAll);
                         attemptGroup.tryPerform(\free);
                         attemptMaster.tryPerform(\free);
+                        attemptBuffers.values.do { |buffer| buffer.free };
                     };
                     if (attemptBus.notNil and: { attemptBus.index.notNil }) {
                         attemptBus.free;
@@ -54,6 +58,9 @@
                     if (app[\voiceGroup] === attemptGroup) { app[\voiceGroup] = nil };
                     if (app[\masterNode] === attemptMaster) { app[\masterNode] = nil };
                     if (app[\mixBus] === attemptBus) { app[\mixBus] = nil };
+                    if (app[\sampleBuffers] === attemptBuffers) {
+                        app[\sampleBuffers] = Dictionary.new;
+                    };
                 };
 
                 if (serverOwned) { server.boot };
@@ -74,6 +81,15 @@
                             server.sync;
 
                             if (app[\bootId] == bootToken) {
+                                app[\samplePaths].keysValuesDo { |key, relativePath|
+                                    var fullPath = app[\root] +/+ relativePath;
+                                    if (PathName(fullPath).isFile) {
+                                        attemptBuffers[key] = Buffer.read(server, fullPath);
+                                    } {
+                                        ("BALKAN//BASS missing optional sample: " ++ fullPath).warn;
+                                    };
+                                };
+                                server.sync;
                                 attemptBus = Bus.audio(server, 2);
                                 app[\mixBus] = attemptBus;
                                 attemptGroup = Group.head(server);
@@ -157,6 +173,7 @@
             app[\voiceGroup].tryPerform(\freeAll);
             app[\voiceGroup].tryPerform(\free);
             app[\masterNode].tryPerform(\free);
+            app[\sampleBuffers].values.do { |buffer| buffer.free };
         };
         app[\mixBus].tryPerform(\free);
         app[\routine] = nil;
@@ -164,6 +181,7 @@
         app[\voiceGroup] = nil;
         app[\masterNode] = nil;
         app[\mixBus] = nil;
+        app[\sampleBuffers] = Dictionary.new;
         app[\state] = \stopped;
 
         if (app[\serverOwned] and: { server.applicationRunning }) {

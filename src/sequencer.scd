@@ -3,16 +3,49 @@
     app[\generatePlan] = {
         var config = app[\config];
         var plan = Array.new(config[\bars] * config[\meterEighths]);
-        var roots = [26, 26, 29, 29, 24, 24, 31, 31];
         var builder = Routine({
+            var rootOrders = [
+                [26, 26, 29, 29, 24, 24, 31, 31],
+                [26, 26, 31, 31, 29, 29, 24, 24],
+                [26, 26, 24, 24, 33, 33, 31, 31],
+                [26, 26, 29, 29, 31, 31, 33, 33]
+            ];
+            // Each two-bar cell has a recognizable answer, with a different
+            // seed selecting different riffs, roots and drum colors.
+            var riffPairs = [
+                [[1, 5], [2, 5]],
+                [[1, 2, 5], [1, 5, 6]],
+                [[2, 5], [1, 2, 6]],
+                [[1, 5, 6], [2, 5]],
+                [[1, 2], [1, 5]],
+                [[2, 5, 6], [1, 5]]
+            ];
+            var rootOrder;
+            var dropBRoots;
+            var cellRiffs;
+            var cellVoices;
+            var cellReplies;
+            var cellKicks;
+            var cellHats;
+            var cellSnares;
             thisThread.randSeed = app[\seed];
+            rootOrder = rootOrders.choose;
+            dropBRoots = rootOrders.choose;
+            cellRiffs = Array.fill(8, { riffPairs.choose });
+            cellVoices = Array.fill(8, { 2.rand });
+            cellReplies = Array.fill(8, { [0, 0, 7, 12].choose });
+            cellKicks = Array.fill(8, { [2, 6].choose });
+            cellHats = Array.fill(8, { 3.rand });
+            cellSnares = Array.fill(8, { [\electroSnare, \hardSnare].choose });
 
             config[\bars].do { |bar|
                 var section;
                 var sectionBar;
                 var isBuild;
                 var isDrop;
-                var root = roots.wrapAt(bar);
+                var root;
+                var cell;
+                var riff;
 
                 section = if (bar < 4, { \intro }, {
                     if (bar < 8, { \build }, {
@@ -26,6 +59,19 @@
                 isBuild = section == \build;
                 isDrop = [\dropA, \dropB].includes(section);
                 sectionBar = if (bar < 8, { bar - 4 }, { bar - 20 });
+                root = if (section == \dropB, {
+                    dropBRoots.wrapAt(bar - 24)
+                }, {
+                    rootOrder.wrapAt(bar)
+                });
+                if (isDrop) {
+                    cell = if (section == \dropA, {
+                        (bar - 8).div(2)
+                    }, {
+                        (bar - 24).div(2) + 4
+                    });
+                    riff = cellRiffs[cell][bar % 2];
+                };
 
                 config[\meterEighths].do { |step|
                     var groupIndex = 0;
@@ -50,7 +96,7 @@
                     var roll = 0;
                     var impact = (step == 0) and: { [8, 24].includes(bar) };
                     var rise = (step == 0) and: { [4, 20].includes(bar) };
-                    var talkCall = ((bar + if (section == \dropB, 1, 0)) % 2) == 1;
+                    var talkCall = isDrop and: { cellVoices[cell] == 1 };
                     var voice = \bbGrowl;
                     var bassMidi;
                     var bassAmp;
@@ -78,12 +124,20 @@
                         } {
                             if (isDrop) {
                                 kick = [0, 3].includes(step) or: {
-                                    (step == 6) and: { (bar % 2) == 1 }
+                                    (step == cellKicks[cell]) and: {
+                                        (bar % 2) == 1 and: {
+                                            1.0.rand < app[\density]
+                                        }
+                                    }
                                 };
                                 snare = step == 4;
-                                hat = [0, 2, 4].includes(step);
+                                hat = switch(cellHats[cell],
+                                    0, { [0, 2, 4].includes(step) },
+                                    1, { [0, 1, 2, 4, 5].includes(step) },
+                                    2, { [0, 2, 3, 4, 6].includes(step) }
+                                );
                                 if ([1, 3, 5, 6].includes(step)) {
-                                    hat = 1.0.rand < (0.25 + (app[\density] * 0.65));
+                                    hat = hat and: { 1.0.rand < (0.35 + (app[\density] * 0.60)) };
                                 };
                                 openHat = (step == 2) and: { (bar % 2) == 1 };
                                 if (openHat) { hat = false };
@@ -91,13 +145,7 @@
                                     1.0.rand < (app[\density] *
                                         if (section == \dropB, 0.75, 0.35))
                                 };
-                                bassHit = [1, 5].includes(step);
-                                if ((step == 2) and: {
-                                    (section == \dropB) or: { (bar % 2) == 0 }
-                                }) { bassHit = true };
-                                if ((step == 6) and: { (bar % 2) == 0 }) {
-                                    bassHit = 1.0.rand < (app[\density] * 0.55);
-                                };
+                                bassHit = riff.includes(step);
                                 if ((step == 6) and: { [15, 31].includes(bar) }) {
                                     bassHit = false;
                                     roll = 1;
@@ -144,7 +192,10 @@
 
                     if (bassHit) {
                         bassMidi = root + 12;
-                        if ([5, 6].includes(step) and: {
+                        if (isDrop and: { [5, 6].includes(step) } and: {
+                            1.0.rand < (0.25 + (app[\variation] * 0.65))
+                        }) { bassMidi = bassMidi + cellReplies[cell] };
+                        if (isDrop.not and: { [5, 6].includes(step) } and: {
                             1.0.rand < (app[\variation] * 0.55)
                         }) { bassMidi = bassMidi + 7 };
                         if (isDrop) {
@@ -176,7 +227,11 @@
                             motionEnd: motionEnd,
                             riseFrac: riseFrac
                         );
-                        if ([1, 2, 5].includes(step) and: { step != 2 or: { isDrop.not } }) {
+                        if ([1, 2, 5].includes(step) and: {
+                            (bassMidi == (root + 12)) and: {
+                                step != 2 or: { isDrop.not }
+                            }
+                        }) {
                             subMidi = root;
                         };
                     };
@@ -186,6 +241,7 @@
                         kick: kick, snare: snare, hat: hat,
                         openHat: openHat, hatTick: hatTick,
                         impact: impact, rise: rise, roll: roll,
+                        snareSample: if (isDrop, { cellSnares[cell] }, { \hardSnare }),
                         kickAmp: if (isDrop, { 0.52 }, {
                             if (isBuild, { 0.43 }, { 0.34 })
                         }),
@@ -228,6 +284,18 @@
                 app[\clock] = TempoClock.new(app[\bpm] / 60);
                 app[\routine] = Routine({
                     var playRun = app[\runId];
+                    var sample = { |key, level = 0.15, hp = 20, rate = 1|
+                        var buffer = app[\sampleBuffers][key];
+                        if (buffer.notNil) {
+                            Synth.tail(source, \bbSample, [
+                                \out, out, \bufnum, buffer.bufnum,
+                                \amp, level, \hp, hp, \rate, rate
+                            ]);
+                            true;
+                        } {
+                            false;
+                        };
+                    };
                     var kick = { |level = 0.43|
                         Synth.tail(source, \bbKick, [\out, out, \amp, level]);
                     };
@@ -253,15 +321,46 @@
                             };
                             if (event[\impact]) {
                                 Synth.tail(source, \bbImpact, [\out, out, \amp, 0.22]);
+                                sample.value(\crash, 0.12, 180);
                             };
-                            if (event[\kick]) { kick.value(event[\kickAmp]) };
-                            if (event[\snare]) { snare.value(event[\snareAmp]) };
+                            if (event[\kick]) {
+                                kick.value(event[\kickAmp]);
+                                if ([\dropA, \dropB].includes(event[\section])) {
+                                    sample.value(\electroKick, 0.17, 170);
+                                };
+                            };
+                            if (event[\snare]) {
+                                snare.value(event[\snareAmp]);
+                                sample.value(event[\snareSample],
+                                    if ([\dropA, \dropB].includes(event[\section]), {
+                                        0.21
+                                    }, { 0.09 }), 110);
+                                if (event[\section] == \dropB) {
+                                    sample.value(\clap, 0.16, 240);
+                                };
+                            };
                             if (event[\hat]) {
-                                hat.value(if ([0, 2, 4].includes(event[\step]), 0.10, 0.07));
+                                if ([\dropA, \dropB].includes(event[\section]) and: {
+                                    sample.value(\closedHat, 0.075, 1800).not
+                                }) {
+                                    hat.value(0.08);
+                                };
+                                if ([\dropA, \dropB].includes(event[\section]).not) {
+                                    hat.value(0.08);
+                                };
                             };
                             if (event[\openHat]) {
-                                Synth.tail(source, \bbOpenHat, [\out, out, \amp, 0.07]);
+                                if (sample.value(\openHat, 0.10, 1300).not) {
+                                    Synth.tail(source, \bbOpenHat, [\out, out, \amp, 0.07]);
+                                };
                             };
+                            if (event[\rise]) { sample.value(\swoosh, 0.11, 300) };
+                            if ([7, 23].includes(event[\bar]) and: {
+                                event[\step] == 5
+                            }) { sample.value(\swoosh, 0.12, 300) };
+                            if ([15, 31].includes(event[\bar]) and: {
+                                event[\step] == 6
+                            }) { sample.value(\glitch, 0.06, 500) };
                             if (event[\subMidi].notNil) {
                                 Synth.tail(source, \bbSub, [
                                     \out, out, \freq, event[\subMidi].midicps,
@@ -298,7 +397,9 @@
                             } {
                                 if (event[\hatTick]) {
                                     0.25.wait;
-                                    hat.value(0.055);
+                                    if (sample.value(\closedHat, 0.05, 1800).not) {
+                                        hat.value(0.055);
+                                    };
                                     0.25.wait;
                                 } {
                                     0.5.wait;

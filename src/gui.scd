@@ -179,7 +179,11 @@
                     widthSlider.valueAction_(controls[\width]);
                 };
             });
-            generateButton.action_({ app[\generatePlan].value });
+            generateButton.action_({
+                // Commit the displayed field before generating, even if the
+                // user clicks Generate without pressing Return in NumberBox.
+                app[\setControl].value(\seed, seedField.value.asInteger);
+            });
             newSeedButton.action_({
                 var seed = ((Main.elapsedTime * 1000000) % 2147483648.0).floor.asInteger;
                 if (app[\setControl].value(\seed, seed)) {

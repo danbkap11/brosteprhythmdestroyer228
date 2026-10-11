@@ -1,6 +1,7 @@
 # BALKAN//BASS
 
-A SuperCollider brostep instrument with synthesized drums, FM growl and
+A SuperCollider brostep instrument with layered CC0 drum/FX one-shots,
+synthetic drums, FM growl and
 talking bass replies, a separate mono sub, and a native control window. The
 default 32-bar phrase is 140 quarter-note BPM in 7/8, grouped 2+2+3. It
 lasts 48 seconds and moves through intro, build, drop, break, build, and a
@@ -11,8 +12,8 @@ second drop.
 1. Install **SuperCollider 3.14.1**. Download the
    [official macOS universal DMG](https://github.com/supercollider/supercollider/releases/download/Version-3.14.1/SuperCollider-3.14.1-macOS-universal.dmg),
    open it, and copy SuperCollider to **Applications**. The SuperCollider IDE,
-   language and audio server come with it. No Quarks, samples, Homebrew or
-   other packages are needed. If macOS blocks the first launch, Control-click
+   language and audio server come with it. The needed samples are already in
+   this repository; no Quarks, Homebrew or other packages are needed. If macOS blocks the first launch, Control-click
    the app in Finder and choose **Open**.
 2. Get the project from
    [GitHub](https://github.com/danbkap11/brosteprhythmdestroyer228): choose
@@ -40,10 +41,12 @@ second drop.
    stops the app and frees its owned audio resources. Evaluate `main.scd`
    again to reopen it.
 
-While stopped, enter a **Seed**, adjust **Density** and **Variation**, or
+While stopped, enter a **Seed** and click **Generate**, adjust **Density** and **Variation**, or
 choose **Destroyer** or **Reese Reply**. **Generate** rebuilds the 32-bar
 event plan from those settings. The same settings produce the same planned
-notes and drum hits. **New Seed** chooses another seed. **Defaults** restores
+notes and drum hits, including the selected two-bar drop riffs, root order,
+drum accents and sample colors. A different seed should now make a more
+obvious change; rare seeds can still select similar combinations. **New Seed** chooses another seed. **Defaults** restores
 the starting controls. Both presets change the existing bass macro controls;
 the notes still alternate growl and talking voices in the drops.
 

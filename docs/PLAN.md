@@ -2,6 +2,12 @@
 
 ## Quick MVP — current authorized scope
 
+The current listening iteration adds a small bundled CC0 drum/FX palette and
+stronger seed-selected two-bar riffs and root orders. These one-shots are an
+explicit exception to the earlier no-samples MVP assumption; they are included
+in the repository and require no separate download. Export, formal tests, and
+additional bass families remain deferred.
+
 Listening feedback on 2026-10-11 authorized a musical expansion of the
 working GUI MVP. The current target is a 32-bar, 48-second phrase at 140 BPM:
 intro 4 bars → build 4 → drop A 8 → break 4 → build 4 → drop B 8. Preserve

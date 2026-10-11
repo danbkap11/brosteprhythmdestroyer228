@@ -11,6 +11,8 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     var drumDefs;
     var bassDefs;
     var talkingDef;
+    var sampleDef;
+    var samplePaths;
     var masterDef;
     var setupLifecycle;
     var setupSequencer;
@@ -40,6 +42,8 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     drumDefs = readModule.value("src/synthdefs/drums.scd");
     bassDefs = readModule.value("src/synthdefs/bass.scd");
     talkingDef = readModule.value("src/synthdefs/bass_talking.scd");
+    sampleDef = readModule.value("src/synthdefs/samples.scd");
+    samplePaths = readModule.value("src/samples.scd");
     masterDef = readModule.value("src/routing.scd");
     setupLifecycle = readModule.value("src/lifecycle.scd");
     setupSequencer = readModule.value("src/sequencer.scd");
@@ -55,6 +59,9 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     app = Dictionary.new;
 
     app[\config] = config;
+    app[\root] = root;
+    app[\samplePaths] = samplePaths;
+    app[\sampleBuffers] = Dictionary.new;
     app[\server] = Server.default;
     app[\serverOwned] = false;
     app[\state] = \stopped;
@@ -68,7 +75,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     app[\masterNode] = nil;
     app[\mixBus] = nil;
     app[\error] = nil;
-    app[\synthDefs] = drumDefs ++ bassDefs ++ [talkingDef];
+    app[\synthDefs] = drumDefs ++ bassDefs ++ [talkingDef, sampleDef];
     app[\masterDef] = masterDef;
     app[\presets] = presets;
 
