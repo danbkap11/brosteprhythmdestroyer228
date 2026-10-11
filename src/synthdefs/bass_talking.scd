@@ -8,8 +8,12 @@ SynthDef(\bbTalking, { |out = 0, freq = 73.42, amp = 0.16, dur = 0.28,
     motionEnd = 0.15, riseFrac = 0.15|
     var safeDur = dur.clip(0.06, 0.72);
     var rise = riseFrac.clip(0.05, 0.80);
+    var tail = (safeDur * 0.16).clip(0.018, 0.10);
     var ampEnv = EnvGen.ar(
-        Env.perc(attack.clip(0.003, 0.02), safeDur, curve: -3),
+        Env([0, 1, 0.88, 0],
+            [attack.clip(0.003, 0.02),
+                (safeDur - attack.clip(0.003, 0.02) - tail).max(0.005), tail],
+            [-4, 0, -4]),
         doneAction: 2
     );
     var gateEnv = EnvGen.ar(
@@ -65,7 +69,12 @@ SynthDef(\bbTalking, { |out = 0, freq = 73.42, amp = 0.16, dur = 0.28,
     var stereo = [center + side, center - side];
     var upper = HPF.ar(HPF.ar(stereo, 150), 150);
     var output = LPF.ar(upper, cutoff.clip(1200, 8000));
-    var wobbleGain = 1 - (0.70 * movementCtl * (1 - motion));
-    Out.ar(out, output * wobbleGain * ampEnv * gateEnv *
+    var compressed = Compander.ar(output, output, 0.12,
+        1, 0.55, 0.004, 0.09);
+    var protected = HPF.ar(HPF.ar(
+        LeakDC.ar((compressed * 1.35).tanh), 150), 150);
+    var wobbleGain = 1 - (0.35 * movementCtl *
+        motionLoop.clip(0, 1) * (1 - motion));
+    Out.ar(out, protected * wobbleGain * ampEnv * gateEnv *
         Lag.kr(amp.clip(0, 0.30), 0.01));
 })

@@ -8,8 +8,12 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     motionEnd = 0.2, riseFrac = 0.25|
     var safeDur = dur.clip(0.07, 0.95);
     var rise = riseFrac.clip(0.05, 0.8);
+    var tail = (safeDur * 0.16).clip(0.018, 0.11);
     var ampEnv = EnvGen.ar(
-        Env.perc(attack.clip(0.003, 0.02), safeDur, curve: -3),
+        Env([0, 1, 0.88, 0],
+            [attack.clip(0.003, 0.02),
+                (safeDur - attack.clip(0.003, 0.02) - tail).max(0.005), tail],
+            [-4, 0, -4]),
         doneAction: 2
     );
     var gateEnv = EnvGen.ar(
@@ -48,7 +52,7 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     var sawRight = Saw.ar(freqCtl * 2.01);
     var source = LPF.ar(carrier * 0.8 +
         ((sawLeft + sawRight) * 0.25 * textureCtl), 7000);
-    var distorted = (source * (1 + (5 * driveCtl))).tanh;
+    var distorted = (source * (1.8 + (6 * driveCtl))).tanh;
     var toneRatio = 2 ** ((toneCtl - 0.5) * 1.4);
     var lowVowel = (430 + (motion * 1000)) * toneRatio;
     var highVowel = (2600 - (motion * 1050)) * toneRatio;
@@ -60,6 +64,12 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     var stereo = [center + side, center - side];
     var upper = HPF.ar(HPF.ar(LeakDC.ar(stereo), 150), 150);
     var output = LPF.ar(upper, cutoff.clip(1500, 8000));
-    Out.ar(out, output * ampEnv * gateEnv *
+    var compressed = Compander.ar(output, output, 0.13,
+        1, 0.55, 0.004, 0.09);
+    var protected = HPF.ar(HPF.ar(
+        LeakDC.ar((compressed * 1.3).tanh), 150), 150);
+    var wobbleGain = 1 - (0.35 * moveCtl *
+        motionLoop.clip(0, 1) * (1 - motion));
+    Out.ar(out, protected * wobbleGain * ampEnv * gateEnv *
         Lag.kr(amp.clip(0, 0.30), 0.01));
 })

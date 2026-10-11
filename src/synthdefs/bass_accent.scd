@@ -8,8 +8,12 @@ SynthDef(\bbAccent, { |out = 0, freq = 73.42, amp = 0.30, dur = 0.3,
     motionEnd = 0.2, riseFrac = 0.25|
     var safeDur = dur.clip(0.07, 0.95);
     var rise = riseFrac.clip(0.05, 0.8);
+    var tail = (safeDur * 0.16).clip(0.018, 0.11);
     var ampEnv = EnvGen.ar(
-        Env.perc(attack.clip(0.002, 0.02), safeDur, curve: -5),
+        Env([0, 1, 0.90, 0],
+            [attack.clip(0.002, 0.02),
+                (safeDur - attack.clip(0.002, 0.02) - tail).max(0.005), tail],
+            [-4, 0, -4]),
         doneAction: 2
     );
     var gateEnv = EnvGen.ar(
@@ -66,6 +70,10 @@ SynthDef(\bbAccent, { |out = 0, freq = 73.42, amp = 0.30, dur = 0.3,
     // Protect the mono sub band after all nonlinear processing.
     var upper = HPF.ar(HPF.ar(LeakDC.ar(stereo), 150), 150);
     var output = LPF.ar(upper, cutoff.clip(1500, 8000));
-    Out.ar(out, output * ampEnv * gateEnv *
+    var compressed = Compander.ar(output, output, 0.14,
+        1, 0.55, 0.004, 0.09);
+    var protected = HPF.ar(HPF.ar(
+        LeakDC.ar((compressed * 1.2).tanh), 150), 150);
+    Out.ar(out, protected * ampEnv * gateEnv *
         Lag.kr(amp.clip(0, 0.32), 0.01));
 })

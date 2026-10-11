@@ -14,8 +14,11 @@
         motionPeak = 1, motionEnd = 0.15, riseFrac = 0.15|
         var safeDur = dur.clip(0.05, 1.48);
         var safeAttack = attack.clip(0.003, 0.02);
+        var tail = (safeDur * 0.16).clip(0.018, 0.12);
         var ampEnv = EnvGen.ar(
-            Env.perc(safeAttack, safeDur, curve: -3), doneAction: 2
+            Env([0, 1, 0.88, 0],
+                [safeAttack, (safeDur - safeAttack - tail).max(0.005), tail],
+                [-4, 0, -4]), doneAction: 2
         );
         var gateEnv = EnvGen.ar(
             Env.asr(0.001, 1, release.clip(0.005, 0.05), -4),
@@ -57,7 +60,7 @@
         var fm = SinOsc.ar(freqCtl + mod);
         var body = (fm * 0.68) + ((sawL + sawR) * 0.20 * textureCtl);
         var preFiltered = LPF.ar(body, 6000);
-        var drive = 1 + (3 * aggressionCtl);
+        var drive = 1.5 + (6 * aggressionCtl);
         var shaped = (preFiltered * drive).tanh / drive.tanh.max(0.1);
         var octaves = 1.5 * growlCtl * ((motion * 2) - 1) * movementCtl;
         var toneRatio = 2 ** ((toneCtl - 0.5) * 2);
@@ -67,13 +70,19 @@
         );
         var rqCtl = Lag.kr(rq.clip(0.25, 0.8), 0.02);
         var filtered = RLPF.ar(shaped, movingCutoff, rqCtl);
-        var mid = LeakDC.ar(filtered);
+        var mid = LeakDC.ar(((filtered * 1.55) + (shaped * 0.25)).tanh);
         var side = LeakDC.ar((sawL - sawR) * 0.5 * textureCtl);
         var wideSide = HPF.ar(HPF.ar(side, 180), 180) * (0.35 * widthCtl);
         var stereo = [mid + wideSide, mid - wideSide];
         var upperBand = HPF.ar(HPF.ar(stereo, 150), 150);
         var output = LPF.ar(upperBand, movingCutoff);
-        var wobbleGain = 1 - (0.70 * movementCtl * (1 - motion));
-        Out.ar(out, output * wobbleGain * ampEnv * gateEnv * ampCtl);
+        var compressed = Compander.ar(output, output, 0.14,
+            1, 0.55, 0.004, 0.09);
+        var protected = HPF.ar(HPF.ar(
+            LeakDC.ar((compressed * 1.25).tanh), 150), 150);
+        var wobbleGain = 1 - (0.35 * movementCtl *
+            motionLoop.clip(0, 1) * (1 - motion));
+        Out.ar(out, protected * wobbleGain *
+            ampEnv * gateEnv * ampCtl);
     })
 ]

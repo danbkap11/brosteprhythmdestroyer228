@@ -8,7 +8,7 @@
     seed: 228,
     density: 0.55,
     variation: 0.25,
-    masterDb: -9,
+    masterDb: -6,
     masterPeak: 0.68,
     bassControls: (
         growl: 0.78,

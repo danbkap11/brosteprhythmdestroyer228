@@ -8,34 +8,14 @@
                 [26, 26, 24, 24, 31, 31, 29, 29],
                 [26, 26, 31, 31, 24, 24, 29, 29],
                 [26, 26, 29, 29, 24, 24, 31, 31],
-                [26, 26, 24, 24, 29, 29, 31, 31],
-                [26, 26, 24, 29, 31, 31, 29, 24],
-                [26, 29, 31, 31, 24, 29, 26, 24]
+                [26, 26, 24, 24, 29, 29, 31, 31]
             ];
             var riffPairs = [
                 [[2, 6, 10, 14], [2, 5, 10, 13]],
                 [[2, 5, 11, 14], [2, 6, 10, 12, 14]],
                 [[0, 3, 6, 10, 13], [2, 6, 11, 14]],
                 [[2, 6, 9, 14], [0, 2, 10, 12, 15]],
-                [[3, 6, 10, 14], [2, 5, 9, 13]],
-                [[0, 2, 7, 10, 14], [3, 5, 8, 11, 15]],
-                [[2, 4, 9, 12], [0, 3, 10, 13, 15]],
-                [[1, 5, 7, 11, 14], [2, 6, 10, 11, 15]],
-                [[0, 5, 10, 14], [2, 3, 7, 10, 13]]
-            ];
-            // Relative semitones for each hit: anchored calls, melodic replies.
-            var contourPairs = [
-                [[0, 0, 7, 5, 0], [0, 5, 10, 7, 0]],
-                [[0, 7, 0, -2, 5], [0, 12, 7, 5, 0]],
-                [[0, 0, 5, 12, 7], [0, -2, 7, 0, 10]],
-                [[0, 5, 7, 0, 12], [0, 10, 5, 7, 0]],
-                [[0, -2, 0, 7, 5], [0, 7, 12, 10, 0]],
-                [[0, 0, 10, 7, 12], [0, 5, 7, -2, 0]]
-            ];
-            var turnaroundRiffs = [
-                [2, 5, 10, 12, 14, 15],
-                [0, 3, 9, 10, 13, 15],
-                [1, 6, 8, 11, 14, 15]
+                [[3, 6, 10, 14], [2, 5, 9, 13]]
             ];
             var introRiffs = [[2], [5], [10], [2, 12], [3]];
             var buildRiffs = [[2, 10], [3, 11], [2, 6, 10], [5, 10]];
@@ -45,9 +25,10 @@
             var buildIndex;
             var cellRiffs;
             var cellVoices;
-            var cellContours;
+            var cellReplies;
             var cellKicks;
             var cellHats;
+            var cellWobble;
             var shoutBars;
 
             thisThread.randSeed = app[\seed];
@@ -57,9 +38,10 @@
             buildIndex = buildRiffs.size.rand;
             cellRiffs = Array.fill(8, { riffPairs.choose });
             cellVoices = Array.fill(8, { 3.rand });
-            cellContours = Array.fill(8, { contourPairs.choose });
+            cellReplies = Array.fill(8, { [0, 0, 7, 12].choose });
             cellKicks = Array.fill(8, { [6, 10, 14].choose });
             cellHats = Array.fill(8, { 3.rand });
+            cellWobble = Array.fill(8, { [1, 2].choose });
             shoutBars = [if (2.rand == 0, { 3 }, { 15 })];
             if (app[\variation] > 0.7 and: { 2.rand == 0 }) {
                 shoutBars = [3, 15];
@@ -87,10 +69,7 @@
                 isDrop = [\dropA, \dropB].includes(section);
                 if (isBuild) {
                     sectionBar = if (bar < 4, { bar - 2 }, { bar - 14 });
-                    activeRiff = buildRiffs[
-                        (buildIndex + sectionBar + if (bar >= 14, { 2 }, { 0 }))
-                            % buildRiffs.size
-                    ];
+                    activeRiff = buildRiffs[buildIndex];
                 };
                 if (section == \intro) {
                     activeRiff = introRiffs[(introIndex + bar) % introRiffs.size];
@@ -105,10 +84,6 @@
                         (bar - 16).div(2) + 4
                     });
                     activeRiff = cellRiffs[cell][bar % 2];
-                    if ((bar % 4) == 3 and: { app[\variation] > 0.1 }) {
-                        // A short turnaround announces the next four-bar phrase.
-                        activeRiff = turnaroundRiffs.choose;
-                    };
                     root = if (section == \dropA, {
                         rootA[bar - 4]
                     }, {
@@ -208,14 +183,17 @@
 
                     if (bassHit) {
                         var position = activeRiff.indexOf(step);
+                        var wobbleHit = isDrop and: {
+                            position == cellWobble[cell]
+                        };
                         nextStep = if (position < (activeRiff.size - 1), {
                             activeRiff[position + 1]
                         }, {
                             config[\stepsPerBar]
                         });
                         gapSteps = nextStep - step;
-                        durBeats = (gapSteps * config[\stepBeats] * 0.84)
-                            .clip(0.17, 1.2);
+                        durBeats = (gapSteps * config[\stepBeats] * 0.94)
+                            .clip(0.17, 1.8);
                         if (isBuild and: { sectionBar == 1 }) {
                             durBeats = durBeats.min(
                                 ((12 - step) * config[\stepBeats] * 0.72)
@@ -223,16 +201,10 @@
                             );
                         };
                         bassMidi = root + 12;
-                        if (isDrop) {
-                            bassMidi = bassMidi +
-                                cellContours[cell][bar % 2][
-                                    position % cellContours[cell][bar % 2].size
-                                ];
-                            if (position > 0 and: {
-                                1.0.rand < (app[\variation] * 0.32)
-                            }) {
-                                bassMidi = bassMidi + [-2, 5, 7].choose;
-                            };
+                        if (isDrop and: { step >= 9 } and: {
+                            1.0.rand < (0.20 + (app[\variation] * 0.65))
+                        }) {
+                            bassMidi = bassMidi + cellReplies[cell];
                         };
                         if (isDrop) {
                             bassVoice = switch(cellVoices[cell],
@@ -253,19 +225,26 @@
                                 if (isBuild, { 0.16 }, { 0.11 })
                             }) * accent,
                             durBeats: durBeats,
+                            topLayer: isDrop and: {
+                                (position == 0) or: { wobbleHit }
+                            },
                             wobbleHz: if (isDrop, { 6.5 }, { 3.0 }),
                             fmIndex: if (isDrop, { 3.0 }, { 2.0 }),
-                            cutoff: if (isDrop, { 6800 }, { 3000 }),
-                            motionLoop: if (isDrop, { 0.58 }, { 0.28 }),
-                            cycleBeats: cycleBeats,
-                            phaseOffset: phaseOffset,
+                            cutoff: if (wobbleHit, { 2600 }, {
+                                if (isDrop, { 6800 }, { 3000 })
+                            }),
+                            motionLoop: if (wobbleHit, { 0.95 }, {
+                                if (isDrop, { 0.42 }, { 0.28 })
+                            }),
+                            cycleBeats: if (wobbleHit, { 0.5 }, { cycleBeats }),
+                            phaseOffset: if (wobbleHit, {
+                                (step % 2) * 0.5
+                            }, { phaseOffset }),
                             motionStart: motionStart,
                             motionEnd: motionEnd,
                             riseFrac: riseFrac
                         );
-                        if (((bassMidi == (root + 12)) or: {
-                            isDrop and: { position == 1 }
-                        }) and: {
+                        if ((bassMidi == (root + 12)) and: {
                             kick.not and: { step > 0 and: { step < 15 } }
                         }) {
                             subMidi = root;
@@ -410,8 +389,11 @@
                                 snare.value(event[\snareAmp]);
                                 sample.value(event[\snareSample],
                                     if (isDrop, { 0.25 }, { 0.08 }), 110);
-                                if (event[\section] == \dropB) {
-                                    sample.value(\clap, 0.16, 240);
+                                if (isDrop) {
+                                    sample.value(\clap,
+                                        if (event[\section] == \dropB, {
+                                            0.14
+                                        }, { 0.10 }), 350);
                                 };
                             };
                             if (event[\hat]) {
@@ -465,6 +447,13 @@
                                     \motionEnd, bass[\motionEnd],
                                     \riseFrac, bass[\riseFrac]
                                 ]);
+                                if (bass[\topLayer]) {
+                                    Synth.tail(source, \bbBassTop, [
+                                        \out, out, \freq, bass[\midi].midicps,
+                                        \dur, bass[\durBeats] / app[\clock].tempo,
+                                        \amp, 0.075
+                                    ]);
+                                };
                             };
                             app[\config][\stepBeats].wait;
                             if ((event[\step] == (app[\config][\stepsPerBar] - 1)) and: {

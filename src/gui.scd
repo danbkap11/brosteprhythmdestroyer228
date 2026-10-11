@@ -88,7 +88,7 @@
                 { |value| app[\setControl].value(\bpm, value) }
             );
             masterSlider = addSlider.value(
-                "Master (dB)", 112, (15 / 18),
+                "Master (dB)", 112, 1,
                 { |value| value.round(0.1).asString },
                 { |position| -24 + (position * 18) },
                 { |value| app[\setControl].value(\masterDb, value) }
@@ -198,7 +198,7 @@
                 textureSlider.valueAction_(0.40);
                 widthSlider.valueAction_(0.12);
                 bpmSlider.valueAction_(0.5);
-                masterSlider.valueAction_(15 / 18);
+                masterSlider.valueAction_(1);
                 seedField.value_(app[\config][\seed]);
                 app[\setControl].value(\seed, app[\config][\seed]);
                 densitySlider.valueAction_(app[\config][\density]);
