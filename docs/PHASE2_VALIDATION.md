@@ -1,5 +1,8 @@
 # Phase 2 Validation Audit
 
+Historical audit of the earlier 7/8 Phase 2 source. The playable app now uses
+4/4; timing findings below must not be applied to the current sequencer.
+
 Date: 2026-10-11
 
 ## Scope and result

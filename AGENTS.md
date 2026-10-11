@@ -12,7 +12,7 @@
 ## Technical constraints
 
 - Target SuperCollider 3.14.x, stock UGens/libraries, native Qt, and native stereo WAV export. Avoid external frontends, unnecessary dependencies, paid plugins, and proprietary samples.
-- Preserve the musical baseline: 140 quarter-note BPM, 7/8 grouped 2+2+3, folk motifs, heavy halftime-inspired grooves, bounded bass variation, and a clean mono sub. The refined brostep direction does not implicitly replace the established meter.
+- Current user-approved groove: 140 quarter-note BPM, 4/4 on a 16-step grid, halftime snare on step 8, bounded bass variation, and a clean mono sub. Earlier 7/8 documents describe historical phases and must not be used to revert the current meter.
 - Keep generation seeded and bounded. Preserve independent layer seeds and the shared real-time/offline event plan.
 - Allocate buses and nodes through owned runtime resources. Respect source → cross → FX → master ordering, synchronize definition loading, and free only resources this application owns.
 - Preserve protected output and conservative default gain when changing DSP. Avoid uncontrolled feedback or bypassing bounds to make a patch louder.

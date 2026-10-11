@@ -1,65 +1,16 @@
 # BALKAN//BASS
 
-A SuperCollider brostep instrument with layered CC0 drum/FX one-shots,
-synthetic drums, FM growl and
-talking bass replies, a separate mono sub, and a native control window. The
-default 32-bar phrase is 140 quarter-note BPM in 7/8, grouped 2+2+3. It
-lasts 48 seconds and moves through intro, build, drop, break, build, and a
-second drop.
+A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, synthesized FM/growl, talking and vowel basses, clean mono sub, and bundled CC0 drum/FX one-shots. Its seeded 24-bar loop moves through intro (2 bars), build (2), drop A (8), break (2), build (2), and drop B (8). At 140 BPM it lasts about **41.14 seconds**.
 
-## Set up on macOS
+## Get it running on macOS
 
-1. Install **SuperCollider 3.14.1**. Download the
-   [official macOS universal DMG](https://github.com/supercollider/supercollider/releases/download/Version-3.14.1/SuperCollider-3.14.1-macOS-universal.dmg),
-   open it, and copy SuperCollider to **Applications**. The SuperCollider IDE,
-   language and audio server come with it. The needed samples are already in
-   this repository; no Quarks, Homebrew or other packages are needed. If macOS blocks the first launch, Control-click
-   the app in Finder and choose **Open**.
-2. Get the project from
-   [GitHub](https://github.com/danbkap11/brosteprhythmdestroyer228): choose
-   **Code → Download ZIP**, unzip it, and keep the folder together. If you
-   already use Git, `git clone https://github.com/danbkap11/brosteprhythmdestroyer228.git`
-   works too.
-3. In macOS **System Settings → Sound → Output**, select your speakers or
-   headphones. Start with the Mac's volume low.
+1. Install [SuperCollider 3.14.1 for macOS](https://github.com/supercollider/supercollider/releases/download/Version-3.14.1/SuperCollider-3.14.1-macOS-universal.dmg). It includes the IDE, language, server and Qt. No Quarks or separate sample download is required.
+2. Get the latest project with `git pull origin main` from an existing clone, or download a fresh ZIP from [GitHub](https://github.com/danbkap11/brosteprhythmdestroyer228). Keep the whole folder together, including `assets/samples`.
+3. Set your Mac's sound output and start at a low speaker/headphone volume.
+4. Close any older BALKAN//BASS window first; evaluating while it is open only focuses that existing session. Open `main.scd` in the SuperCollider IDE. Press **Command+A**, then **Command+Return** to evaluate the whole file. Wait until the new BALKAN//BASS window says **Ready** and press **Play**. The app does not play automatically.
 
-## Play
+Drop A starts after about **6.86 seconds**; Drop B starts after about **27.43 seconds**. Press **Stop** before changing the seed, density, variation or preset. Enter a seed and click **Generate** to make a new plan; **Play** restarts it from bar one. The same seed and controls select the same planned events, though synthesized noise may differ between plays. The six bass sliders affect new notes, and tempo changes take effect at the next bar. Closing the window releases this app's audio resources.
 
-1. Open `main.scd` from the downloaded project folder in the SuperCollider
-   IDE. Select the whole file with **Command+A** and evaluate it with
-   **Command+Return**. The project loads its other files relative to
-   `main.scd`; leave them in the same folder structure.
-2. Wait for the BALKAN//BASS window to show **Ready**, then press **Play**.
-   The app prepares audio on launch but waits for Play before making music.
-   At 140 BPM, Drop A starts about **12 seconds** in and Drop B about
-   **36 seconds** in; the full phrase repeats after 48 seconds.
-3. Move **Tempo**, **Master**, or the six bass sliders while playing. Bass
-   changes affect new notes. A tempo change takes effect after the current
-   bar; notes already sounding keep their original modulation rate.
-4. Press **Stop** to fade and release the current loop. Press **Play** to
-   restart the same loop from bar one. Close the window when finished; it
-   stops the app and frees its owned audio resources. Evaluate `main.scd`
-   again to reopen it.
+The project includes [CC0 sample credits](assets/samples/README.md). These are licensed one-shots and original synth sounds, not samples from a commercial artist's recordings.
 
-While stopped, enter a **Seed** and click **Generate**, adjust **Density** and **Variation**, or
-choose **Destroyer** or **Reese Reply**. **Generate** rebuilds the 32-bar
-event plan from those settings. The same settings produce the same planned
-notes and drum hits, including the opening bass rhythm, two-bar drop riffs, root order,
-drum accents and sample colors. A different seed should now make a more
-obvious change; rare seeds can still select similar combinations. **New Seed** chooses another seed. **Defaults** restores
-the starting controls. Both presets change the existing bass macro controls;
-the notes still alternate growl and talking voices in the drops.
-
-## If it does not start or you hear nothing
-
-Look at the SuperCollider **Post Window**. An **Error** status in the app means
-you should close its window, then evaluate `main.scd` again after addressing
-the Post Window error. If the app says **Ready** and **Playing** but is silent,
-check the Mac's selected sound output and volume, the app's Master control,
-and any server or device errors in the Post Window. Closing the app does not
-quit a SuperCollider server that was already running before this project.
-
-For help, share the first error and nearby stack trace from the Post Window,
-your macOS version, and the SuperCollider version shown in the IDE. This
-project has received source review in a Linux cloud workspace; compilation,
-GUI operation and listening on macOS 3.14.1 have not yet been verified.
+If startup fails, copy the **first** error and nearby stack trace from SuperCollider's Post Window, plus your macOS and SuperCollider versions. This cloud workspace has no `sclang` or `scsynth`; the latest revision has had source and asset checks here, but not a macOS compilation, playback or listening check.

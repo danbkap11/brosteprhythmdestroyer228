@@ -1,18 +1,7 @@
 # Progress
 
-Current source revision: CC0 one-shots layer the synthesized drop drums and
-transitions, with optional-sample fallback. Seeds now choose two-bar bass riffs,
-drop root orders, reply intervals, drum accents and sample snare colors; the
-opening bass rhythms, and the GUI Generate action commits its displayed seed.
-The new code and sounds have
-not been compiled, played or heard on macOS in this cloud workspace.
+Current listening iteration: 140 BPM, 4/4 halftime, 16 sixteenth steps per bar, and a 24-bar loop of about 41.14 seconds. The first drop starts after four bars. Seeded two-bar bass riffs, a new bounded `bbYoi` mid-bass reply, layered CC0 drums, a snare-slam one-shot, tom fills and reverse-crash transitions are wired into the existing GUI engine. The clean mono sub and protected master remain separate. Export and formal test infrastructure remain deferred.
 
-The current target is the 32-bar, 140 BPM, 7/8 (2+2+3) brostep GUI arrangement described at the top of PLAN.md. It uses the existing native transport and controls, deterministic seeded events, a clean sub, and two factory character presets. Export and formal test infrastructure remain deferred.
+Previous versions used a 7/8 eight-bar loop and then a 7/8 32-bar arrangement. The earlier cloud audit corrected a Random call, boot-waiter cancellation, playback-time Defaults mismatch, off-accent hat density, and seed overflow; server-loss polling received a partial source fix. Startup failure replies still need a safe local check. The user reported hearing and controlling an earlier GUI version on macOS but found its music unconvincing.
 
-The earlier cloud audit corrected the unsupported Random call, boot-waiter cancellation/token handling, playback-time Defaults mismatch, inert off-accent hat density, and elapsed-time seed overflow. Server-loss polling received a partial source fix. A /fail listener that assumed nonexistent synth/group fields in stock 3.14.1 replies was removed; startup /d_recv and master creation errors still need a safe local check. This workspace still has no sclang/scsynth, so cloud compilation and playback remain unavailable.
-
-The user reported hearing and controlling the first GUI groove on macOS, but
-found its music unconvincing. The next source revision expands the event plan
-to 32 bars with build/drop/break sections, coherent bass/sub roots, alternating
-growl/talking phrases, drum rolls, risers and impacts. The revised sound has
-not yet been compiled, played or heard on the user's Mac.
+This cloud workspace has no `sclang` or `scsynth`. The current 4/4 source and assets have not been compiled, played or heard on the user's Mac. Existing Phase 2 validation and audit reports document historical source inspections, not proof that this revision runs.

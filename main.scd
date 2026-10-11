@@ -11,6 +11,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     var drumDefs;
     var bassDefs;
     var talkingDef;
+    var yoiDef;
     var sampleDef;
     var samplePaths;
     var masterDef;
@@ -42,6 +43,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     drumDefs = readModule.value("src/synthdefs/drums.scd");
     bassDefs = readModule.value("src/synthdefs/bass.scd");
     talkingDef = readModule.value("src/synthdefs/bass_talking.scd");
+    yoiDef = readModule.value("src/synthdefs/bass_yoi.scd");
     sampleDef = readModule.value("src/synthdefs/samples.scd");
     samplePaths = readModule.value("src/samples.scd");
     masterDef = readModule.value("src/routing.scd");
@@ -55,6 +57,11 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     };
     if (talkingDef.isKindOf(SynthDef).not) {
         Error("The talking bass SynthDef did not load. Check the first earlier Post Window error.").throw;
+    };
+    if (yoiDef.isKindOf(SynthDef).not or: {
+        sampleDef.isKindOf(SynthDef).not
+    }) {
+        Error("A bass or sample SynthDef did not load. Check the first earlier Post Window error.").throw;
     };
     app = Dictionary.new;
 
@@ -75,7 +82,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     app[\masterNode] = nil;
     app[\mixBus] = nil;
     app[\error] = nil;
-    app[\synthDefs] = drumDefs ++ bassDefs ++ [talkingDef, sampleDef];
+    app[\synthDefs] = drumDefs ++ bassDefs ++ [talkingDef, yoiDef, sampleDef];
     app[\masterDef] = masterDef;
     app[\presets] = presets;
 

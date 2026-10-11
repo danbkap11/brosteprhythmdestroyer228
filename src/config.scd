@@ -1,8 +1,10 @@
 (
     bpm: 140,
-    meterEighths: 7,
-    grouping: [2, 2, 3],
-    bars: 32,
+    meterEighths: 8,
+    stepsPerBar: 16,
+    stepBeats: 0.25,
+    grouping: [4, 4, 4, 4],
+    bars: 24,
     seed: 228,
     density: 0.55,
     variation: 0.25,

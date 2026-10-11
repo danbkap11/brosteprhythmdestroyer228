@@ -2,18 +2,22 @@
 
 ## Quick MVP — current authorized scope
 
-The current listening iteration adds a small bundled CC0 drum/FX palette and
-stronger seed-selected two-bar riffs and root orders. These one-shots are an
-explicit exception to the earlier no-samples MVP assumption; they are included
-in the repository and require no separate download. Export, formal tests, and
-additional bass families remain deferred.
+The user's latest listening direction supersedes the earlier 7/8 contract:
+**140 quarter-note BPM, 4/4 halftime, 16 sixteenth-note steps per bar**, with
+the main snare on step 8. The current loop is 24 bars / about 41.14 seconds:
+intro 2 → build 2 → drop A 8 → break 2 → build 2 → drop B 8. Drop A begins
+after about 6.86 seconds. Keep seeded, pre-generated riffs, a separate mono
+sub, native GUI, protected master, and owned-resource cleanup. The bundled
+CC0 drum/FX one-shots and a third bounded mid-bass voice serve this listening
+iteration; no external download is required. Export and formal tests remain
+deferred. Sections below this Quick MVP note describe historical planning,
+including a superseded 7/8 version.
 
-Listening feedback on 2026-10-11 authorized a musical expansion of the
-working GUI MVP. The current target is a 32-bar, 48-second phrase at 140 BPM:
-intro 4 bars → build 4 → drop A 8 → break 4 → build 4 → drop B 8. Preserve
-7/8 grouped 2+2+3, the native GUI and transport, deterministic seeded event
-plan, separate mono sub, and protected output. A new bounded talking bass
-reply and synthesized open hat, riser, and impact serve this composition.
+Historical listening feedback on 2026-10-11 authorized a 32-bar, 48-second
+phrase at 140 BPM: intro 4 bars → build 4 → drop A 8 → break 4 → build 4 →
+drop B 8. That version kept 7/8 grouped 2+2+3, the native GUI and transport,
+deterministic seeded events, separate mono sub, and protected output. It added
+a talking bass reply and synthesized open hat, riser, and impact.
 The previous eight-bar scope below records the first working version.
 
 ### Earlier eight-bar GUI baseline (superseded)

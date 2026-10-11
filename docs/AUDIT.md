@@ -1,5 +1,8 @@
 # BALKAN//BASS application audit
 
+Historical audit of the earlier 7/8 app. The current user-approved groove is
+4/4; timing findings below do not describe the current sequencer.
+
 Date: 2026-10-11. Target: stock SuperCollider 3.14.1 on macOS.
 
 ## Scope, evidence, and actual feature inventory

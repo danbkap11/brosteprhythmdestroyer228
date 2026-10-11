@@ -1,5 +1,10 @@
 # BALKAN//BASS bass design
 
+Current groove update: the user switched the playable app to 4/4 halftime at
+140 quarter-note BPM. The 7/8 sequencing examples below are historical design
+notes, not instructions to revert the current app. The bass SynthDefs remain
+meter-independent; the app now also registers `bbYoi` as a bounded drop reply.
+
 Status: implementation specification only, 2026-10-11. No application changes, installation, compilation, server execution, render, or listening test are part of this task.
 
 Current implementation note: `bbTalking` was subsequently added in
