@@ -51,10 +51,22 @@
                 var snapshot = app[\status].value;
                 var state = snapshot[\state];
                 var label = state.asString;
+                var sectionLabel;
 
                 if (state == \booting) { label = "Preparing server"; };
                 if (state == \ready) { label = "Ready"; };
-                if (state == \playing) { label = "Playing"; };
+                if (state == \playing) {
+                    sectionLabel = switch(snapshot[\section],
+                        \intro, { "Intro" },
+                        \build, { "Build" },
+                        \dropA, { "Drop A" },
+                        \breakdown, { "Break" },
+                        \dropB, { "Drop B" },
+                        { "Loop" }
+                    );
+                    label = "Playing — " ++ sectionLabel ++
+                        " · bar " ++ snapshot[\bar].asString;
+                };
                 if (state == \stopping) { label = "Stopping"; };
                 if (state == \failed) {
                     label = "Error — check the SuperCollider Post Window";
@@ -76,7 +88,7 @@
                 { |value| app[\setControl].value(\bpm, value) }
             );
             masterSlider = addSlider.value(
-                "Master (dB)", 112, (12 / 18),
+                "Master (dB)", 112, (15 / 18),
                 { |value| value.round(0.1).asString },
                 { |position| -24 + (position * 18) },
                 { |value| app[\setControl].value(\masterDb, value) }
@@ -151,7 +163,7 @@
             defaultsButton = Button(window, Rect(262, 542, 110, 30))
                 .states_([["Defaults"]]);
             StaticText(window, Rect(390, 542, 290, 30))
-                .string_("7/8 grouped 2+2+3 • eight-bar loop");
+                .string_("7/8 · 2+2+3 · 32-bar build/drop");
 
             playButton.action_({ app[\start].value });
             stopButton.action_({ app[\stop].value });
@@ -182,7 +194,7 @@
                 textureSlider.valueAction_(0.40);
                 widthSlider.valueAction_(0.12);
                 bpmSlider.valueAction_(0.5);
-                masterSlider.valueAction_(12 / 18);
+                masterSlider.valueAction_(15 / 18);
                 seedField.value_(app[\config][\seed]);
                 app[\setControl].value(\seed, app[\config][\seed]);
                 densitySlider.valueAction_(app[\config][\density]);

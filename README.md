@@ -1,8 +1,10 @@
 # BALKAN//BASS
 
-A small SuperCollider instrument with synthesized drums, a moving FM/reese
-bass, a separate mono sub, and a native control window. The default loop is
-140 quarter-note BPM in 7/8, grouped 2+2+3. Eight bars take 12 seconds.
+A SuperCollider brostep instrument with synthesized drums, FM growl and
+talking bass replies, a separate mono sub, and a native control window. The
+default 32-bar phrase is 140 quarter-note BPM in 7/8, grouped 2+2+3. It
+lasts 48 seconds and moves through intro, build, drop, break, build, and a
+second drop.
 
 ## Set up on macOS
 
@@ -28,6 +30,8 @@ bass, a separate mono sub, and a native control window. The default loop is
    `main.scd`; leave them in the same folder structure.
 2. Wait for the BALKAN//BASS window to show **Ready**, then press **Play**.
    The app prepares audio on launch but waits for Play before making music.
+   At 140 BPM, Drop A starts about **12 seconds** in and Drop B about
+   **36 seconds** in; the full phrase repeats after 48 seconds.
 3. Move **Tempo**, **Master**, or the six bass sliders while playing. Bass
    changes affect new notes. A tempo change takes effect after the current
    bar; notes already sounding keep their original modulation rate.
@@ -37,11 +41,11 @@ bass, a separate mono sub, and a native control window. The default loop is
    again to reopen it.
 
 While stopped, enter a **Seed**, adjust **Density** and **Variation**, or
-choose **Destroyer** or **Reese Reply**. **Generate** rebuilds the eight-bar
+choose **Destroyer** or **Reese Reply**. **Generate** rebuilds the 32-bar
 event plan from those settings. The same settings produce the same planned
 notes and drum hits. **New Seed** chooses another seed. **Defaults** restores
-the starting controls. Reese Reply is a character setting of the existing
-bass voice.
+the starting controls. Both presets change the existing bass macro controls;
+the notes still alternate growl and talking voices in the drops.
 
 ## If it does not start or you hear nothing
 

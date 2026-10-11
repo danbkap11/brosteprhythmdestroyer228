@@ -2,6 +2,11 @@
 
 Status: implementation specification only, 2026-10-11. No application changes, installation, compilation, server execution, render, or listening test are part of this task.
 
+Current implementation note: `bbTalking` was subsequently added in
+`src/synthdefs/bass_talking.scd` for the 32-bar GUI arrangement. The remaining
+dedicated bass families below are design specifications. The new voice has
+not been compiled or listened to in the cloud workspace.
+
 ## 1. Baseline and decisions
 
 Read alongside [PLAN.md](PLAN.md), [PHASE2_VALIDATION.md](PHASE2_VALIDATION.md), and root [AGENTS.md](../AGENTS.md). This document specifies the requested next bass work within the approved architecture. It does not authorize GUI, arrangement, FFT, export, or cross-synthesis implementation. The PLAN roadmap labels differ from the conversation's Phase 3; use the requested bass scope, not the phase number, to choose work.

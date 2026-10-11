@@ -2,11 +2,11 @@
     bpm: 140,
     meterEighths: 7,
     grouping: [2, 2, 3],
-    bars: 8,
+    bars: 32,
     seed: 228,
     density: 0.55,
     variation: 0.25,
-    masterDb: -12,
+    masterDb: -9,
     masterPeak: 0.68,
     bassControls: (
         growl: 0.78,

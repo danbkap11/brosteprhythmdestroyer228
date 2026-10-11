@@ -10,6 +10,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     var config;
     var drumDefs;
     var bassDefs;
+    var talkingDef;
     var masterDef;
     var setupLifecycle;
     var setupSequencer;
@@ -38,6 +39,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     config = readModule.value("src/config.scd");
     drumDefs = readModule.value("src/synthdefs/drums.scd");
     bassDefs = readModule.value("src/synthdefs/bass.scd");
+    talkingDef = readModule.value("src/synthdefs/bass_talking.scd");
     masterDef = readModule.value("src/routing.scd");
     setupLifecycle = readModule.value("src/lifecycle.scd");
     setupSequencer = readModule.value("src/sequencer.scd");
@@ -46,6 +48,9 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     setupGui = readModule.value("src/gui.scd");
     if (setupSequencer.isKindOf(Function).not) {
         Error("The sequencer module did not compile to a setup Function. Check the first earlier Post Window error.").throw;
+    };
+    if (talkingDef.isKindOf(SynthDef).not) {
+        Error("The talking bass SynthDef did not load. Check the first earlier Post Window error.").throw;
     };
     app = Dictionary.new;
 
@@ -63,7 +68,7 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     app[\masterNode] = nil;
     app[\mixBus] = nil;
     app[\error] = nil;
-    app[\synthDefs] = drumDefs ++ bassDefs;
+    app[\synthDefs] = drumDefs ++ bassDefs ++ [talkingDef];
     app[\masterDef] = masterDef;
     app[\presets] = presets;
 

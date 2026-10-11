@@ -1,5 +1,11 @@
 # Progress
 
-The current target is the Quick MVP in PLAN.md: use the existing eight-bar, 140 BPM, 7/8 (2+2+3) drum/growl/sub loop with native Qt Play/Stop, tempo/master/macro controls, deterministic event generation, Density/Variation and two factory character presets. Export, extra voices, complex arrangement, and formal test infrastructure remain deferred.
+The current target is the 32-bar, 140 BPM, 7/8 (2+2+3) brostep GUI arrangement described at the top of PLAN.md. It uses the existing native transport and controls, deterministic seeded events, a clean sub, and two factory character presets. Export and formal test infrastructure remain deferred.
 
-An audit found and received source fixes for the unsupported Random call, boot-waiter cancellation/token handling, playback-time Defaults mismatch, inert off-accent hat density, and elapsed-time seed overflow. Server-loss polling received a partial source fix. A /fail listener that assumed nonexistent synth/group fields in stock 3.14.1 replies was removed; startup /d_recv and master creation errors still need a safe local check. Nothing has compiled or run: this workspace has no sclang/scsynth. On macOS SuperCollider 3.14.1, launch main.scd, verify Ready/Play, repeat Generate at one seed, change Density/Variation and preset, test Defaults only while stopped, and exercise Stop/Play and close/relaunch. Share Post Window errors and report runtime outcomes as unverified until done.
+The earlier cloud audit corrected the unsupported Random call, boot-waiter cancellation/token handling, playback-time Defaults mismatch, inert off-accent hat density, and elapsed-time seed overflow. Server-loss polling received a partial source fix. A /fail listener that assumed nonexistent synth/group fields in stock 3.14.1 replies was removed; startup /d_recv and master creation errors still need a safe local check. This workspace still has no sclang/scsynth, so cloud compilation and playback remain unavailable.
+
+The user reported hearing and controlling the first GUI groove on macOS, but
+found its music unconvincing. The next source revision expands the event plan
+to 32 bars with build/drop/break sections, coherent bass/sub roots, alternating
+growl/talking phrases, drum rolls, risers and impacts. The revised sound has
+not yet been compiled, played or heard on the user's Mac.

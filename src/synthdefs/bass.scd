@@ -73,6 +73,7 @@
         var stereo = [mid + wideSide, mid - wideSide];
         var upperBand = HPF.ar(HPF.ar(stereo, 150), 150);
         var output = LPF.ar(upperBand, movingCutoff);
-        Out.ar(out, output * ampEnv * gateEnv * ampCtl);
+        var wobbleGain = 1 - (0.70 * movementCtl * (1 - motion));
+        Out.ar(out, output * wobbleGain * ampEnv * gateEnv * ampCtl);
     })
 ]

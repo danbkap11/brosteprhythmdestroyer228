@@ -8,6 +8,8 @@
     app[\density] = app[\config][\density];
     app[\variation] = app[\config][\variation];
     app[\presetName] = \destroyer;
+    app[\section] = \intro;
+    app[\bar] = 1;
 
     app[\setControl] = { |key, value|
         var validNumber = value.isKindOf(Number);
@@ -115,6 +117,7 @@
             message: app[\message],
             bpm: app[\bpm],
             pendingBpm: app[\pendingBpm],
+            section: app[\section], bar: app[\bar],
             seed: app[\seed], density: app[\density], variation: app[\variation],
             preset: app[\presetName]
         );

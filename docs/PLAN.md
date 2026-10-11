@@ -2,6 +2,16 @@
 
 ## Quick MVP — current authorized scope
 
+Listening feedback on 2026-10-11 authorized a musical expansion of the
+working GUI MVP. The current target is a 32-bar, 48-second phrase at 140 BPM:
+intro 4 bars → build 4 → drop A 8 → break 4 → build 4 → drop B 8. Preserve
+7/8 grouped 2+2+3, the native GUI and transport, deterministic seeded event
+plan, separate mono sub, and protected output. A new bounded talking bass
+reply and synthesized open hat, riser, and impact serve this composition.
+The previous eight-bar scope below records the first working version.
+
+### Earlier eight-bar GUI baseline (superseded)
+
 This personal music toy prioritizes a usable GUI and playback over production validation or the complete long-term architecture. Keep the current synthesized kick/snare/hat, mono sub, and moving FM/reese growl. Preserve 140 quarter-note BPM, 7/8 grouped 2+2+3, the eight-bar loop, conservative master protection, and owned start/stop/shutdown behavior.
 
 Add native Qt controls for Play/Stop, status, BPM, master level, and the existing six bass macros. Macro controls affect following notes. Tempo changes take effect at the next bar boundary on the same TempoClock. Opening the app prepares the server without starting playback; evaluating the launcher while its window is open focuses that window. The current quick target also includes a pre-generated seeded eight-bar loop, bounded Density and Variation controls, and two data-only character presets. The selected event plan is reused on each Play until Generate or a stopped generation setting change rebuilds it.
