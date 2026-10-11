@@ -8,7 +8,7 @@ the main snare on step 8. The current loop is 24 bars / about 41.14 seconds:
 intro 2 → build 2 → drop A 8 → break 2 → build 2 → drop B 8. Drop A begins
 after about 6.86 seconds. Keep seeded, pre-generated riffs, a separate mono
 sub, native GUI, protected master, and owned-resource cleanup. The bundled
-CC0 drum/FX one-shots and a third bounded mid-bass voice serve this listening
+CC0 drum/FX one-shots and bounded mid-bass voices serve this listening
 iteration; no external download is required. Export and formal tests remain
 deferred. Sections below this Quick MVP note describe historical planning,
 including a superseded 7/8 version.

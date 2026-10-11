@@ -196,11 +196,16 @@
                                 1, { if (step < 8, { \bbYoi }, { \bbTalking }) },
                                 2, { if (step < 8, { \bbTalking }, { \bbYoi }) }
                             );
+                            // Replace the first riff note with a harder attack.
+                            // This does not add another low-frequency voice.
+                            if (step == activeRiff[0]) { bassVoice = \bbAccent };
                         };
                         bassEvent = (
                             synth: bassVoice,
                             midi: bassMidi,
-                            amp: if (isDrop, { 0.27 }, {
+                            amp: if (isDrop, {
+                                if (step == activeRiff[0], { 0.32 }, { 0.27 })
+                            }, {
                                 if (isBuild, { 0.16 }, { 0.11 })
                             }) * accent,
                             durBeats: durBeats,

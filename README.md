@@ -1,6 +1,6 @@
 # BALKAN//BASS
 
-A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, synthesized FM/growl, talking and vowel basses, clean mono sub, and bundled CC0 drum/FX one-shots. Its seeded 24-bar loop moves through intro (2 bars), build (2), drop A (8), break (2), build (2), and drop B (8). At 140 BPM it lasts about **41.14 seconds**.
+A SuperCollider 3.14.1 music toy: 140 BPM, **4/4 halftime**, synthesized FM/growl, talking and vowel basses, a punchy accent bass on the first riff hit of each drop bar, clean mono sub, and bundled CC0 drum/FX one-shots. Its seeded 24-bar loop moves through intro (2 bars), build (2), drop A (8), break (2), build (2), and drop B (8). At 140 BPM it lasts about **41.14 seconds**.
 
 ## Get it running on macOS
 
