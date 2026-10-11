@@ -63,3 +63,31 @@ mono 44.1 kHz, 16-bit PCM WAV. The kick supplies attack above the synthesized
 kick's low body; the snare replaces the former stack of multiple snare samples
 on drop beats. These are style-appropriate licensed one-shots, not a claim of
 being the exact samples used in any artist's recording.
+
+## Bass chops and brostep snare — 2026-10-11 rework
+
+Each source page below explicitly labels its sound **Creative Commons 0**.
+The downloads were the public `hq.mp3` previews, converted to mono 44.1 kHz,
+16-bit PCM WAV. Conversion does not restore the lossless originals; those
+original downloads require a Freesound account. Local peaks were normalized
+to 0.85, with short end fades to avoid cut clicks.
+
+| Local file | Source | Local treatment |
+| --- | --- | --- |
+| `growl_e_hit.wav` | [1 Hit Growl_Bass_E.wav — MichaelMalong, 360545](https://freesound.org/people/MichaelMalong/sounds/360545/) | 290 ms, 125 Hz high-pass, 20 ms end fade; source fundamental near E1. |
+| `reese_f_call.wav` | [Growly F.wav — TechGeekMusic, 353268](https://freesound.org/people/TechGeekMusic/sounds/353268/) | 1.15 s, 125 Hz high-pass, 70 ms end fade; source fundamental near F1. |
+| `brostep_snare.wav` | [Brostep - Wide Punchy Snare — Hybrid_V, 319613](https://freesound.org/people/Hybrid_V/sounds/319613/) | 600 ms, 95 Hz high-pass, 60 ms end fade; retained low-mid body. |
+
+Preview URLs:
+
+- `https://cdn.freesound.org/previews/360/360545_5916931-hq.mp3`
+- `https://cdn.freesound.org/previews/353/353268_6397561-hq.mp3`
+- `https://cdn.freesound.org/previews/319/319613_5436764-hq.mp3`
+
+`bbBassSample` replaces a selected synthesized mid-bass event; it does not
+stack an extra low bass underneath it. The sequencer's E2/F2 reference values
+match its upper-bass note register while retaining the recordings' lower
+source register. For example, D2/E2 playback transposes the E1 recording to
+D1; high-pass processing keeps its upper harmonics while the separate sub
+supplies the clean D1 fundamental. Sample pitch ratios are bounded, all six
+macros affect processing, and a finite envelope owns each node's lifetime.

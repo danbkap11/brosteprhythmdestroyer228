@@ -1,83 +1,87 @@
 { |app|
-    // The seed resolves the whole 24-bar event plan before playback.
+    // Resolve one original hook and two-bar bass cells once, before playback.
     app[\generatePlan] = {
         var config = app[\config];
         var plan = Array.new(config[\bars] * config[\stepsPerBar]);
         var builder = Routine({
-            var rootOrders = [
-                [26, 26, 24, 24, 31, 31, 29, 29],
-                [26, 26, 31, 31, 24, 24, 29, 29],
-                [26, 26, 29, 29, 24, 24, 31, 31],
-                [26, 26, 24, 24, 29, 29, 31, 31]
+            // [sixteenth onset, length in sixteenths, semitone reply, character]
+            // Calls, answers and silence are composed together, never stacked.
+            var rhythmBank = [
+                [
+                    [[0, 7, 0, \growl], [10, 2, 0, \yoi], [13, 2, 7, \accent]],
+                    [[0, 2, 0, \accent], [3, 2, 0, \yoi], [6, 1, 3, \talk],
+                        [10, 3, 0, \growl], [14, 1, 7, \rave]]
+                ],
+                [
+                    [[0, 3, 0, \accent], [4, 3, 0, \growl], [10, 5, 0, \growl]],
+                    [[1, 2, 0, \yoi], [4, 3, 0, \growl], [10, 2, 7, \accent],
+                        [13, 2, 0, \rave]]
+                ],
+                [
+                    [[0, 6, 0, \growl], [10, 2, 3, \yoi], [13, 1, 0, \accent],
+                        [15, 1, 7, \yoi]],
+                    [[0, 2, 0, \accent], [3, 4, 0, \growl],
+                        [10, 4, 0, \screech], [15, 1, 0, \rave]]
+                ],
+                [
+                    [[0, 2, 0, \accent], [3, 2, 0, \yoi], [6, 1, 0, \accent],
+                        [10, 5, 0, \growl]],
+                    [[0, 7, 0, \growl], [10, 2, 7, \yoi], [13, 2, 3, \rave]]
+                ],
+                [
+                    [[0, 7, 0, \growl], [10, 3, 7, \screech], [14, 1, 0, \accent]],
+                    [[0, 2, 0, \accent], [4, 3, 0, \talk], [10, 2, 0, \yoi],
+                        [13, 2, 7, \rave]]
+                ],
+                [
+                    [[0, 3, 0, \growl], [5, 2, 0, \accent], [10, 2, 3, \yoi],
+                        [13, 2, 0, \growl]],
+                    [[0, 7, 0, \growl], [10, 2, 7, \accent], [13, 2, 0, \rave]]
+                ]
             ];
-            var riffPairs = [
-                [[2, 6, 10, 14], [2, 5, 10, 13]],
-                [[2, 5, 11, 14], [2, 6, 10, 12, 14]],
-                [[0, 3, 6, 10, 13], [2, 6, 11, 14]],
-                [[2, 6, 9, 14], [0, 2, 10, 12, 15]],
-                [[3, 6, 10, 14], [2, 5, 9, 13]]
+            // Sparse pentatonic rave calls: an original motif, not a song quote.
+            var hooks = [
+                [[[0, 0, 2], [3, 7, 2], [6, 3, 2], [11, 0, 2]],
+                    [[2, 10, 2], [6, 7, 3], [12, 0, 3]]],
+                [[[0, 0, 3], [5, 3, 2], [10, 7, 3]],
+                    [[0, 10, 2], [3, 7, 2], [6, 3, 2], [12, 0, 3]]],
+                [[[0, 7, 2], [3, 0, 2], [6, 3, 3], [12, 0, 2]],
+                    [[2, 7, 2], [5, 10, 2], [10, 7, 2], [14, 0, 1]]]
             ];
-            // A few two-bar calls leave room for a sustained wobbling answer.
-            var longCallPairs = [
-                [[0, 9, 12], [2, 5, 10, 14]],
-                [[2, 10, 13], [0, 3, 9, 14]],
-                [[0, 10, 14], [3, 6, 11, 15]],
-                [[2, 9, 12, 15], [0, 10, 13]]
-            ];
-            var introRiffs = [[2], [5], [10], [2, 12], [3]];
-            var buildRiffs = [[2, 10], [3, 11], [2, 6, 10], [5, 10]];
-            var rootA;
-            var rootB;
-            var rootIndexA;
-            var rootIndexB;
-            var introIndex;
-            var buildIndex;
-            var cellRiffs;
-            var cellVoices;
-            var cellReplies;
-            var cellKicks;
-            var cellHats;
-            var cellWobble;
-            var shoutBars;
+            var tonic;
+            var hook;
+            var mainCell;
+            var changeCell;
+            var secondCell;
+            var cellOrderA;
+            var cellOrderB;
+            var kickReply;
+            var voiceReply;
+            var dropRootsA = [0, 0, 0, 0, -2, -2, 0, 0];
+            var dropRootsB = [0, 0, 3, 3, -2, -2, 0, 0];
 
             thisThread.randSeed = app[\seed];
-            rootIndexA = rootOrders.size.rand;
-            rootIndexB = (rootIndexA + 1 + (rootOrders.size - 1).rand)
-                % rootOrders.size;
-            rootA = rootOrders[rootIndexA];
-            rootB = rootOrders[rootIndexB];
-            introIndex = introRiffs.size.rand;
-            buildIndex = buildRiffs.size.rand;
-            cellRiffs = Array.fill(8, { |cellIndex|
-                var useLong = [2, 6].includes(cellIndex);
-                if (useLong.not) {
-                    useLong = 1.0.rand <
-                        (0.25 + (app[\variation] * 0.55));
-                };
-                if (useLong, {
-                    longCallPairs.choose
-                }, {
-                    riffPairs.choose
-                })
-            });
-            cellVoices = Array.fill(8, { 3.rand });
-            cellReplies = Array.fill(8, { [0, 5, 7, 12].choose });
-            cellKicks = Array.fill(8, { [6, 10, 14].choose });
-            cellHats = Array.fill(8, { 3.rand });
-            cellWobble = Array.fill(8, { [1, 2].choose });
-            shoutBars = [if (2.rand == 0, { 3 }, { 15 })];
-            if (app[\variation] > 0.7 and: { 2.rand == 0 }) {
-                shoutBars = [3, 15];
-            };
+            tonic = [26, 29, 31].choose;
+            hook = hooks.choose;
+            mainCell = rhythmBank.size.rand;
+            changeCell = (mainCell + 1 + (rhythmBank.size - 1).rand) % rhythmBank.size;
+            secondCell = (mainCell + 2 + 3.rand) % rhythmBank.size;
+            cellOrderA = [mainCell, mainCell, changeCell, mainCell];
+            cellOrderB = [secondCell, mainCell, secondCell, changeCell];
+            kickReply = Array.fill(8, { [5, 6, 11, 14].choose });
+            voiceReply = [\bbYoi, \bbTalking].choose;
 
             config[\bars].do { |bar|
                 var section;
-                var sectionBar = 0;
+                var sectionBar;
                 var isBuild;
                 var isDrop;
-                var cell = nil;
-                var root = 26;
-                var activeRiff = nil;
+                var isFinalBuild;
+                var root = tonic;
+                var cell = 0;
+                var notes = [];
+                var hookNotes = [];
+                var phraseEnd;
 
                 section = if (bar < 2, { \intro }, {
                     if (bar < 4, { \build }, {
@@ -88,249 +92,219 @@
                         });
                     });
                 });
+                sectionBar = switch(section,
+                    \intro, { bar }, \build, { if (bar < 4, { bar - 2 }, { bar - 14 }) },
+                    \dropA, { bar - 4 }, \breakdown, { bar - 12 }, \dropB, { bar - 16 }
+                );
                 isBuild = section == \build;
                 isDrop = [\dropA, \dropB].includes(section);
-                if (isBuild) {
-                    sectionBar = if (bar < 4, { bar - 2 }, { bar - 14 });
-                    activeRiff = buildRiffs[buildIndex];
-                };
-                if (section == \intro) {
-                    activeRiff = introRiffs[(introIndex + bar) % introRiffs.size];
-                };
-                if (section == \breakdown) {
-                    activeRiff = if ((bar % 2) == 0, { [10] }, { [5] });
-                };
+                isFinalBuild = isBuild and: { sectionBar == 1 };
+                phraseEnd = isDrop and: { ((sectionBar + 1) % 4) == 0 };
                 if (isDrop) {
-                    cell = if (section == \dropA, {
-                        (bar - 4).div(2)
-                    }, {
-                        (bar - 16).div(2) + 4
-                    });
-                    activeRiff = cellRiffs[cell][bar % 2];
-                    root = if (section == \dropA, {
-                        rootA[bar - 4]
-                    }, {
-                        rootB[bar - 16]
-                    });
+                    cell = sectionBar.div(2) + if (section == \dropB, { 4 }, { 0 });
+                    notes = rhythmBank[if (section == \dropA, {
+                        cellOrderA[sectionBar.div(2)]
+                    }, { cellOrderB[sectionBar.div(2)] })][sectionBar % 2];
+                    root = tonic + if (section == \dropA, {
+                        dropRootsA[sectionBar]
+                    }, { dropRootsB[sectionBar] });
+                } {
+                    hookNotes = hook[sectionBar % 2];
                 };
 
                 config[\stepsPerBar].do { |step|
-                    var groupIndex = step.div(4);
-                    var groupStart = groupIndex * 4;
-                    var cycleBeats = config[\grouping][groupIndex] *
-                        config[\stepBeats];
-                    var phaseOffset = ((step - groupStart) *
-                        config[\stepBeats]) / cycleBeats;
-                    var motionStart = [0.08, 0.68, 0.14, 0.78][groupIndex];
-                    var motionEnd = [0.28, 0.12, 0.42, 0.06][groupIndex];
-                    var riseFrac = [0.18, 0.42, 0.28, 0.64][groupIndex];
-                    var accent = [1.0, 0.88, 1.06, 0.84][groupIndex];
-                    var gap = isBuild and: {
-                        sectionBar == 1 and: { step >= 12 }
-                    };
+                    var gap = isFinalBuild and: { step >= 12 };
+                    var note = notes.detect { |item| item[0] == step };
+                    var hookNote = hookNotes.detect { |item| item[0] == step };
                     var kick = false;
                     var snare = false;
+                    var snareRoll = false;
                     var hat = false;
                     var openHat = false;
-                    var bassHit = activeRiff.includes(step);
+                    var bass = nil;
+                    var lead = nil;
                     var subMidi = nil;
-                    var subDecay = 0.17;
-                    var bassEvent = nil;
+                    var subDurBeats = 0.25;
                     var tom = nil;
-                    var bassMidi;
-                    var bassVoice = \bbGrowl;
-                    var nextStep;
-                    var gapSteps;
-                    var durBeats;
+                    var hatAmp = 0.045;
+                    var snareAmp = 0.23;
+                    var bassDur;
+                    var role;
+                    var synth;
+                    var offset;
+                    var isLong;
+                    var nextKickStep;
 
                     if (section == \intro) {
-                        kick = step == 0;
-                        snare = step == 8;
-                        hat = [0, 4, 8, 12].includes(step) or: {
-                            ((introIndex % 2) == 1) and: {
-                                [2, 10].includes(step)
-                            }
-                        };
-                    };
-                    if (isBuild) {
-                        kick = [0, 6].includes(step);
-                        snare = step == 8;
-                        hat = (step % 2) == 0 or: {
-                            1.0.rand < (0.05 + (app[\density] * 0.25))
-                        };
-                        if (sectionBar == 1) {
-                            // Roll toward, then clear space for, the shout.
-                            if ([9, 10, 11].includes(step)) { snare = true };
-                            if (step == 8) { tom = \tomHigh };
-                            if (step == 10) { tom = \tomMid };
-                            if (step == 11) { tom = \tomLow };
-                        };
-                    };
-                    if (isDrop) {
-                        kick = step == 0 or: {
-                            (step == cellKicks[cell]) and: {
-                                1.0.rand < (if ((bar % 2) == 1, {
-                                    0.70 + (app[\density] * 0.20)
-                                }, {
-                                    0.25 + (app[\density] * 0.50)
-                                }))
-                            }
-                        };
-                        snare = step == 8;
-                        hat = (step % 2) == 0;
-                        if ((step % 2) == 1) {
-                            hat = (cellHats[cell] > 0) and: {
-                                1.0.rand < (app[\density] *
-                                    if (cellHats[cell] == 2, { 0.62 }, { 0.32 }))
-                            };
-                        };
-                        openHat = (step == 14) and: { (bar % 2) == 0 };
-                        if (openHat) { hat = false };
-                        if ([11, 23].includes(bar)) {
-                            if (step == 12) { tom = \tomHigh };
-                            if (step == 14) { tom = \tomMid };
-                            if (step == 15) { tom = \tomLow };
+                        kick = (step == 0) and: { sectionBar == 1 };
+                        snare = (step == 8) and: { sectionBar == 1 };
+                        hat = [0, 4, 8, 12].includes(step);
+                        if (sectionBar == 1 and: { step == 10 }) {
+                            note = [10, 3, 0, \talk];
                         };
                     };
                     if (section == \breakdown) {
-                        kick = step == 0;
-                        snare = step == 8;
-                        hat = [0, 8, 12].includes(step);
-                        bassVoice = \bbTalking;
+                        hat = [0, 8].includes(step);
+                        // Leave the break open, with one low swell answering the hook.
+                        if (sectionBar == 1 and: { step == 10 }) {
+                            note = [10, 4, 0, \growl];
+                        };
                     };
-                    if (gap) {
-                        kick = false;
-                        snare = false;
-                        hat = false;
-                        openHat = false;
-                        bassHit = false;
-                        tom = nil;
+                    if (isBuild) {
+                        kick = if (isFinalBuild, {
+                            [0, 4].includes(step)
+                        }, { [0, 6].includes(step) });
+                        snare = if (isFinalBuild, {
+                            [0, 4, 6, 8, 9, 10, 11].includes(step)
+                        }, { [4, 8, 12, 14].includes(step) });
+                        snareRoll = snare;
+                        snareAmp = if (isFinalBuild, {
+                            (0.065 + (step * 0.011)).clip(0.065, 0.19)
+                        }, { 0.10 + (step * 0.003) });
+                        hat = (step % 2) == 0;
+                        // Final build leaves only drums/riser before the vocal.
+                        if (isFinalBuild and: { step >= 8 }) { hookNote = nil };
                     };
-
-                    if (bassHit) {
-                        var position = activeRiff.indexOf(step);
-                        var wobbleHit;
-                        nextStep = if (position < (activeRiff.size - 1), {
-                            activeRiff[position + 1]
-                        }, {
-                            config[\stepsPerBar]
-                        });
-                        gapSteps = nextStep - step;
-                        wobbleHit = isDrop and: {
-                            (position == cellWobble[cell]) or: {
-                                (position == 0) and: { gapSteps >= 7 }
+                    if (isDrop) {
+                        kick = step == 0 or: {
+                            (step == kickReply[cell]) and: {
+                                ((sectionBar % 2) == 1) or: {
+                                    1.0.rand < (0.3 + (app[\density] * 0.5))
+                                }
                             }
                         };
-                        durBeats = (gapSteps * config[\stepBeats] * 0.94)
-                            .clip(0.17, 2.6);
-                        if (isBuild and: { sectionBar == 1 }) {
-                            durBeats = durBeats.min(
-                                ((12 - step) * config[\stepBeats] * 0.72)
-                                    .max(0.08)
-                            );
+                        snare = step == 8;
+                        snareAmp = 0.30;
+                        // Backbeat breathes; hats accent offbeats, with seeded ghosts.
+                        hat = [2, 6, 10, 14].includes(step) or: {
+                            ((step % 2) == 0) and: {
+                                1.0.rand < (0.2 + (app[\density] * 0.5))
+                            }
                         };
-                        bassMidi = root + 12;
-                        if (isDrop and: { step >= 9 } and: {
-                            1.0.rand < (0.30 + (app[\variation] * 0.50))
-                        }) {
-                            bassMidi = bassMidi + cellReplies[cell];
+                        if ((step % 2) == 1) {
+                            hat = 1.0.rand < (app[\density] * 0.23);
                         };
-                        if (isDrop) {
-                            bassVoice = switch(cellVoices[cell],
-                                0, { if (step < 8, { \bbGrowl }, { \bbYoi }) },
-                                1, { if (step < 8, { \bbYoi }, { \bbTalking }) },
-                                2, { if (step < 8, { \bbTalking }, { \bbYoi }) }
-                            );
-                            // Short calls punch; long calls keep the growl voice
-                            // so its modulation and full note tail can develop.
-                            if (step == activeRiff[0]) {
-                                bassVoice = if (gapSteps >= 7, {
-                                    \bbGrowl
-                                }, { \bbAccent });
-                            };
+                        hatAmp = if ([2, 6, 10, 14].includes(step), { 0.069 }, { 0.035 });
+                        openHat = (step == 14) and: { (sectionBar % 2) == 0 };
+                        if (openHat) { hat = false };
+                        if (phraseEnd and: { step >= 14 }) {
+                            // A brief turn-around, not four layers filling every gap.
+                            note = nil;
+                            hat = false;
+                            openHat = false;
+                            tom = if (step == 14, { \tomMid }, { \tomLow });
+                            if (step == 15) { snare = true; snareAmp = 0.13; snareRoll = true };
                         };
-                        bassEvent = (
-                            synth: bassVoice,
-                            midi: bassMidi,
-                            amp: if (isDrop, {
-                                if (step == activeRiff[0], { 0.31 }, { 0.27 })
-                            }, {
-                                if (isBuild, { 0.16 }, { 0.11 })
-                            }) * accent,
-                            durBeats: durBeats,
-                            topLayer: isDrop and: {
-                                (position == 0) or: { wobbleHit }
-                            },
-                            wobbleHz: if (isDrop, { 6.5 }, { 3.0 }),
-                            fmIndex: if (isDrop, { 3.0 }, { 2.0 }),
-                            cutoff: if (wobbleHit, { 2600 }, {
-                                if (isDrop, { 6800 }, { 3000 })
-                            }),
-                            motionLoop: if (wobbleHit, { 0.95 }, {
-                                if (isDrop, { 0.42 }, { 0.28 })
-                            }),
-                            cycleBeats: if (wobbleHit, { 0.5 }, { cycleBeats }),
-                            phaseOffset: if (wobbleHit, {
-                                (step % 2) * 0.5
-                            }, { phaseOffset }),
-                            motionStart: motionStart,
-                            motionEnd: motionEnd,
-                            riseFrac: riseFrac
+                        if (note.notNil and: { step > 12 } and: {
+                            note[3] != \rave and: {
+                                1.0.rand > (0.65 + (app[\density] * 0.35))
+                            }
+                        }) { note = nil };
+                    };
+                    if (hookNote.notNil) {
+                        lead = (
+                            midi: tonic + 36 + hookNote[1],
+                            durBeats: hookNote[2] * config[\stepBeats] * 0.76,
+                            amp: if (section == \breakdown, { 0.10 }, {
+                                if (isBuild, { 0.12 }, { 0.13 })
+                            })
                         );
-                        if ((bassMidi == (root + 12)) and: {
-                            kick.not and: { step > 0 and: { step < 15 } }
-                        }) {
+                    };
+                    if (note.notNil) {
+                        role = note[3];
+                        offset = note[2];
+                        // The hook's answer has its own space instead of masking a bass note.
+                        if (role == \rave) {
+                            lead = (
+                                midi: root + 36 + offset,
+                                durBeats: note[1] * config[\stepBeats] * 0.78,
+                                amp: 0.12
+                            );
                             subMidi = root;
-                            subDecay = (durBeats / (config[\bpm] / 60) * 0.7)
-                                .clip(0.12, 0.25);
-                            // Leave the next sixteenth clear if this cell can
-                            // place its extra kick there.
-                            if (isDrop and: {
-                                cellKicks[cell] == (step + 1)
-                            }) {
-                                subMidi = nil;
-                            };
+                            subDurBeats = note[1] * config[\stepBeats] * 0.72;
+                        } {
+                            isLong = note[1] >= 4;
+                            synth = switch(role,
+                                \growl, { \bbGrowl }, \accent, { \bbAccent },
+                                \yoi, { voiceReply }, \talk, { \bbTalking },
+                                \screech, { \bbScreech }
+                            );
+                            if (role == \screech and: { section == \dropA } and: {
+                                sectionBar < 4
+                            }) { synth = \bbYoi };
+                            if (isDrop and: { step > 8 } and: {
+                                1.0.rand < (app[\variation] * 0.32)
+                            }) { offset = [0, 3, 7, 10].choose };
+                            bassDur = note[1] * config[\stepBeats] *
+                                if (isLong, { 0.97 }, { 0.78 });
+                            bass = (
+                                synth: synth,
+                                midi: root + 12 + offset + if (synth == \bbScreech, { 12 }, { 0 }),
+                                amp: if (isDrop, {
+                                    if (step == 0, { 0.30 }, { 0.27 })
+                                }, { 0.14 }),
+                                durBeats: bassDur,
+                                // The core voice owns its harmonics; layer only phrase accents.
+                                topLayer: false,
+                                sample: if (isDrop and: { step == notes[0][0] } and: {
+                                    (sectionBar % 4) == 0
+                                }, {
+                                    if (isLong, { \growlyCall }, { \growlHit })
+                                }, { nil }),
+                                sampleRoot: if (isLong, { 41 }, { 40 }),
+                                wobbleHz: 4, fmIndex: 3,
+                                cutoff: if (isLong, { 5600 }, { 7200 }),
+                                motionLoop: if (isLong, { 0.92 }, { 0.32 }),
+                                cycleBeats: if (isLong, {
+                                    if (section == \dropB, { 0.5 }, { 1.0 })
+                                }, { 0.5 }),
+                                phaseOffset: if (isLong, { 0.12 }, { 0.38 }),
+                                motionStart: 0.78, motionEnd: 0.08,
+                                riseFrac: if (isLong, { 0.18 }, { 0.08 })
+                            );
+                            // The sub holds the harmonic root, even under upper-register replies.
+                            subMidi = root;
+                            subDurBeats = bassDur * 0.94;
                         };
                     };
-                    // Delay the clean sub until the kick's transient has passed
-                    // when a long call starts on the downbeat.
-                    if (isDrop and: { activeRiff[0] == 0 } and: {
-                        step == 2
-                    }) {
-                        subMidi = root;
-                        subDecay = 0.28;
+                    if (subMidi.notNil) {
+                        // End clean low voices before the next known kick or section gap.
+                        nextKickStep = if (isDrop and: { kickReply[cell] > step }, {
+                            kickReply[cell]
+                        }, { 16 });
+                        subDurBeats = subDurBeats.min(
+                            ((nextKickStep - step) * config[\stepBeats] - 0.035).max(0.06)
+                        );
                     };
-
+                    if (gap) {
+                        kick = false; snare = false; hat = false; openHat = false;
+                        bass = nil; lead = nil; subMidi = nil; tom = nil;
+                    };
                     plan.add((
                         bar: bar, step: step, section: section,
-                        kick: kick, snare: snare, hat: hat,
-                        openHat: openHat, tom: tom,
-                        impact: (step == 0) and: {
-                            [4, 8, 16, 20].includes(bar)
-                        },
-                        rise: (step == 0) and: { [2, 14].includes(bar) },
-                        reverseCrash: (step == 0) and: {
-                            [3, 15].includes(bar)
-                        },
-                        shout: (step == 12) and: { shoutBars.includes(bar) },
-                        robot: (step == 12) and: {
-                            [11, 23].includes(bar)
-                        },
-                        kickAmp: if (isDrop, { 0.52 }, {
-                            if (isBuild, { 0.42 }, { 0.30 })
-                        }),
-                        snareAmp: if (isDrop, { 0.30 }, {
+                        sectionGain: if (isDrop, { 1.0 }, {
                             if (isBuild, {
-                                if ([9, 10, 11].includes(step), {
-                                    0.09 + ((step - 9) * 0.035)
-                                }, { 0.28 })
-                            }, { 0.20 })
+                                if (isFinalBuild, { 0.58 }, { 0.50 })
+                            }, { if (section == \intro, { 0.58 }, { 0.42 }) })
                         }),
-                        snareSample: if (isDrop, { \beefySnare }, { \hardSnare }),
+                        kick: kick, snare: snare, snareRoll: snareRoll,
+                        hat: hat, hatAmp: hatAmp, openHat: openHat, tom: tom,
+                        cut: isFinalBuild and: { step == 12 },
+                        impact: (step == 0) and: { [4, 16].includes(bar) },
+                        rise: (step == 0) and: { [2, 14].includes(bar) },
+                        reverseCrash: false,
+                        // Every drop now receives the same clear vocal cue.
+                        shout: isFinalBuild and: { step == 12 },
+                        robot: false,
+                        kickAmp: if (isDrop, { 0.48 }, { 0.32 }),
+                        snareAmp: snareAmp,
+                        snareDecay: if (snareRoll, { 0.075 }, { 0.23 }),
+                        snareSample: if (isDrop, { \brostepSnare }, { \hardSnare }),
                         subMidi: subMidi,
-                        subAmp: if (isDrop, { 0.20 }, { 0.12 }),
-                        subDecay: subDecay,
-                        bass: bassEvent
+                        subAmp: if (isDrop, { 0.18 }, { 0.12 }),
+                        subDecay: 0.19,
+                        subDurBeats: subDurBeats,
+                        bass: bass, lead: lead
                     ));
                 };
             };
@@ -352,6 +326,7 @@
             } {
                 var source = app[\voiceGroup];
                 var out = app[\mixBus].index;
+                var duckOut = app[\duckBus].index;
 
                 if (app[\pendingBpm].notNil) {
                     app[\bpm] = app[\pendingBpm];
@@ -381,9 +356,9 @@
                             \out, out, \amp, level, \decay, 0.20
                         ]);
                     };
-                    var snare = { |level = 0.28|
+                    var snare = { |level = 0.28, decay = 0.23|
                         Synth.tail(source, \bbSnare, [
-                            \out, out, \amp, level
+                            \out, out, \amp, level, \decay, decay
                         ]);
                     };
                     var hat = { |level = 0.07|
@@ -398,12 +373,17 @@
                                 app[\section] = event[\section];
                                 app[\bar] = event[\bar] + 1;
                             };
+                            // One timestamp per grid point keeps layered attacks together.
+                            app[\server].makeBundle(app[\server].latency, {
+                            if (event[\step] == 0) {
+                                app[\masterNode].set(\sectionGain, event[\sectionGain]);
+                            };
+                            if (event[\cut]) { source.freeAll };
                             if (event[\rise]) {
                                 Synth.tail(source, \bbRise, [
-                                    \out, out, \amp, 0.17,
-                                    \dur, 8 / app[\clock].tempo
+                                    \out, out, \amp, 0.16,
+                                    \dur, 7 / app[\clock].tempo
                                 ]);
-                                sample.value(\swoosh, 0.12, 300, 0.4);
                             };
                             if (event[\reverseCrash]) {
                                 sample.value(\reverseCrash, 0.19, 180, 0.45);
@@ -425,6 +405,7 @@
                                 sample.value(\crash, 0.15, 200, 0.45);
                             };
                             if (event[\kick]) {
+                                app[\duckNode].tryPerform(\set, \t_kick, 1);
                                 kick.value(event[\kickAmp]);
                                 if (isDrop) {
                                     if (sample.value(\attackKick, 0.24, 145).not) {
@@ -433,18 +414,22 @@
                                 };
                             };
                             if (event[\snare]) {
-                                snare.value(event[\snareAmp]);
+                                snare.value(event[\snareAmp], event[\snareDecay]);
                                 if (sample.value(event[\snareSample],
-                                    if (isDrop, { 0.25 }, { 0.08 }), 135).not) {
+                                    if (isDrop and: { event[\snareRoll].not }, {
+                                        0.22
+                                    }, { 0.055 }),
+                                    if (event[\snareRoll], { 750 }, {
+                                        if (isDrop, { 95 }, { 135 })
+                                    })).not) {
                                     if (isDrop) {
-                                        sample.value(\snareSlam, 0.22, 135);
+                                        if (sample.value(\beefySnare, 0.22, 135).not) {
+                                            sample.value(\snareSlam, 0.20, 135);
+                                        };
                                     };
                                 };
-                                if (isDrop) {
-                                    sample.value(\hardClap, 0.12, 700, 0.28);
-                                    if (event[\section] == \dropB) {
-                                        sample.value(\clap, 0.05, 450);
-                                    };
+                                if (isDrop and: { event[\snareRoll].not }) {
+                                    sample.value(\hardClap, 0.08, 700, 0.28);
                                 };
                             };
                             if (event[\hat]) {
@@ -452,15 +437,15 @@
                                 if (isDrop) {
                                     if ((event[\step] % 2) == 1) {
                                         playedHat = sample.value(
-                                            \tightHat, 0.075, 1500, 0.30);
+                                            \tightHat, event[\hatAmp], 1500, 0.30);
                                     };
                                     if (playedHat.not) {
-                                        if (sample.value(\closedHat, 0.065, 1500, 0.32).not) {
-                                            hat.value;
+                                        if (sample.value(\closedHat, event[\hatAmp], 1500, 0.32).not) {
+                                            hat.value(event[\hatAmp]);
                                         };
                                     };
                                 } {
-                                    hat.value;
+                                    hat.value(event[\hatAmp]);
                                 };
                             };
                             if (event[\openHat]) {
@@ -486,13 +471,30 @@
                             if (event[\subMidi].notNil) {
                                 Synth.tail(source, \bbSub, [
                                     \out, out, \freq, event[\subMidi].midicps,
-                                    \amp, event[\subAmp], \decay, event[\subDecay]
+                                    \amp, event[\subAmp], \decay, event[\subDecay],
+                                    \dur, event[\subDurBeats] / app[\clock].tempo,
+                                    \duckBus, duckOut
+                                ]);
+                            };
+                            if (event[\lead].notNil) {
+                                Synth.tail(source, \bbRave, [
+                                    \out, out, \freq, event[\lead][\midi].midicps,
+                                    \amp, event[\lead][\amp],
+                                    \dur, event[\lead][\durBeats] / app[\clock].tempo,
+                                    \duckBus, duckOut
                                 ]);
                             };
                             if (bass.notNil) {
-                                Synth.tail(source, bass[\synth], [
+                                var bassBuffer = if (bass[\sample].notNil, {
+                                    app[\sampleBuffers][bass[\sample]]
+                                }, { nil });
+                                var bassSynth = if (bassBuffer.notNil, {
+                                    \bbBassSample
+                                }, { bass[\synth] });
+                                var bassArgs = [
                                     \out, out, \freq, bass[\midi].midicps,
                                     \amp, bass[\amp],
+                                    \duckBus, duckOut,
                                     \dur, bass[\durBeats] / app[\clock].tempo,
                                     \wobbleHz, bass[\wobbleHz],
                                     \fmIndex, bass[\fmIndex],
@@ -511,15 +513,23 @@
                                     \motionPeak, 1,
                                     \motionEnd, bass[\motionEnd],
                                     \riseFrac, bass[\riseFrac]
-                                ]);
+                                ];
+                                if (bassBuffer.notNil) {
+                                    bassArgs = bassArgs ++ [
+                                        \bufnum, bassBuffer.bufnum,
+                                        \rootFreq, bass[\sampleRoot].midicps
+                                    ];
+                                };
+                                Synth.tail(source, bassSynth, bassArgs);
                                 if (bass[\topLayer]) {
                                     Synth.tail(source, \bbBassTop, [
                                         \out, out, \freq, bass[\midi].midicps,
                                         \dur, bass[\durBeats] / app[\clock].tempo,
-                                        \amp, 0.095
+                                        \amp, 0.095, \duckBus, duckOut
                                     ]);
                                 };
                             };
+                            });
                             app[\config][\stepBeats].wait;
                             if ((event[\step] == (app[\config][\stepsPerBar] - 1)) and: {
                                 app[\pendingBpm].notNil
@@ -549,7 +559,8 @@
             app[\routine].tryPerform(\stop);
             app[\state] = \stopping;
             app[\masterNode].set(\amp, 0);
-            SystemClock.sched(0.075, {
+            // Drain already timestamped note bundles before freeing source nodes.
+            SystemClock.sched(app[\server].latency + 0.075, {
                 if ((app[\runId] == stopRun) and: { app[\state] == \stopping }) {
                     app[\voiceGroup].freeAll;
                     app[\clock].clear;

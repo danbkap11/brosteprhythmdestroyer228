@@ -3,6 +3,11 @@
 Historical audit of the earlier 7/8 Phase 2 source. The playable app now uses
 4/4; timing findings below must not be applied to the current sequencer.
 
+Later validation note, 2026-10-11: the current 4/4 rework has actual language,
+NRT, dummy-JACK lifecycle and offscreen Qt evidence on Linux SC 3.13.0.
+See [PROGRESS.md](PROGRESS.md) for versions and limitations. The historical
+static-only results below are preserved; they do not describe this later build.
+
 Date: 2026-10-11
 
 ## Scope and result

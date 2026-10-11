@@ -16,6 +16,10 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     var bassTopDef;
     var shoutDef;
     var sampleDef;
+    var sampleBassDef;
+    var screechDef;
+    var raveDef;
+    var duckDef;
     var samplePaths;
     var masterDef;
     var setupLifecycle;
@@ -24,12 +28,14 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     var setupGui;
     var presets;
     var app;
+    var relaunchDelay = 0;
 
     if (executingPath.isNil) {
         Error("Open and evaluate main.scd from the SuperCollider IDE so its relative modules can be found.").throw;
     };
     if (existing.notNil) {
-        existing[\shutdown].tryPerform(\value);
+        relaunchDelay = existing[\shutdown].tryPerform(\value);
+        if (relaunchDelay.isKindOf(Number).not) { relaunchDelay = 0.35 };
     };
 
     root = PathName(executingPath).pathOnly;
@@ -51,6 +57,10 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     bassTopDef = readModule.value("src/synthdefs/bass_top.scd");
     shoutDef = readModule.value("src/synthdefs/shout.scd");
     sampleDef = readModule.value("src/synthdefs/samples.scd");
+    sampleBassDef = readModule.value("src/synthdefs/bass_sample.scd");
+    screechDef = readModule.value("src/synthdefs/bass_screech.scd");
+    raveDef = readModule.value("src/synthdefs/rave.scd");
+    duckDef = readModule.value("src/synthdefs/duck.scd");
     samplePaths = readModule.value("src/samples.scd");
     masterDef = readModule.value("src/routing.scd");
     setupLifecycle = readModule.value("src/lifecycle.scd");
@@ -93,9 +103,17 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     app[\voiceGroup] = nil;
     app[\masterNode] = nil;
     app[\mixBus] = nil;
+    app[\duckBus] = nil;
+    app[\duckNode] = nil;
+    app[\shutdownPending] = false;
+    app[\shutdownAt] = 0;
     app[\error] = nil;
     app[\synthDefs] = drumDefs ++ bassDefs ++
-        [talkingDef, yoiDef, accentDef, bassTopDef, shoutDef, sampleDef];
+        [talkingDef, yoiDef, accentDef, bassTopDef, shoutDef, sampleDef,
+            sampleBassDef, screechDef, raveDef, duckDef];
+    if (app[\synthDefs].every { |definition| definition.isKindOf(SynthDef) }.not) {
+        Error("A SynthDef module did not compile. Check the first Post Window error.").throw;
+    };
     app[\masterDef] = masterDef;
     app[\presets] = presets;
 
@@ -122,6 +140,6 @@ if (existing.notNil and: { existing[\guiOpen] == true }) {
     {
         app[\openGui].value;
         app[\boot].value;
-    }.defer;
+    }.defer(relaunchDelay.max(0));
 };
 )

@@ -7,10 +7,25 @@ meter-independent; the app now also registers `bbYoi` as a bounded drop reply.
 
 Status: implementation specification only, 2026-10-11. No application changes, installation, compilation, server execution, render, or listening test are part of this task.
 
-Current implementation note: `bbTalking` was subsequently added in
-`src/synthdefs/bass_talking.scd` for the 32-bar GUI arrangement. The remaining
-dedicated bass families below are design specifications. The new voice has
-not been compiled or listened to in the cloud workspace.
+Current implementation note (2026-10-11 rework, supersedes historical notes
+below): the GUI app registers Growl, Talking, Yoi, Accent, sparse Screech,
+and a pitched sample-chop voice. A separate Rave SynthDef supplies the hook;
+it is not another sub layer. Dedicated Reese/Wobble families remain deferred.
+Growl uses three FM operators with bounded low/high-band saturation. Shared
+macros remain 0–1, finite notes retain automatic freeing and early gate release,
+and tempo/phase comes from the one sequencer clock. Default patch trims were
+calibrated on actual renders, including increasing the previously quiet
+Talking reply. Final high-passes are 115 Hz for most mids and 180 Hz for Screech;
+the mono sub retains its 90 Hz low-pass, old decay argument and optional finite
+`dur`/early `gate`. Optional kick `duckBus = -1` means no ducking when used solo.
+It affects amplitude only, not note timing or DSP topology.
+
+Routing and current exceptions are recorded in PLAN.md's Quick MVP scope.
+Current modules actually compile and render on a Linux SC 3.13.0 compatibility
+runtime; endpoints, live changes, release and mono fixtures passed. This does
+not establish target macOS 3.14.1 compatibility or perceptual quality. No
+listening occurred here. See PROGRESS.md; all unqualified static-only statements
+and 7/8 acceptance tables below describe the historical design phase.
 
 ## 1. Baseline and decisions
 

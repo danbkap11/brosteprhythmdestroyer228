@@ -26,6 +26,8 @@
         var attemptBus;
         var attemptGroup;
         var attemptMaster;
+        var attemptDuckBus;
+        var attemptDuckNode;
         var attemptBuffers;
         var releaseAttempt;
 
@@ -43,6 +45,8 @@
                 attemptBus = nil;
                 attemptGroup = nil;
                 attemptMaster = nil;
+                attemptDuckBus = nil;
+                attemptDuckNode = nil;
                 attemptBuffers = Dictionary.new;
                 app[\sampleBuffers] = attemptBuffers;
                 releaseAttempt = {
@@ -50,14 +54,20 @@
                         attemptGroup.tryPerform(\freeAll);
                         attemptGroup.tryPerform(\free);
                         attemptMaster.tryPerform(\free);
+                        attemptDuckNode.tryPerform(\free);
                         attemptBuffers.values.do { |buffer| buffer.free };
                     };
                     if (attemptBus.notNil and: { attemptBus.index.notNil }) {
                         attemptBus.free;
                     };
+                    if (attemptDuckBus.notNil and: { attemptDuckBus.index.notNil }) {
+                        attemptDuckBus.free;
+                    };
                     if (app[\voiceGroup] === attemptGroup) { app[\voiceGroup] = nil };
                     if (app[\masterNode] === attemptMaster) { app[\masterNode] = nil };
                     if (app[\mixBus] === attemptBus) { app[\mixBus] = nil };
+                    if (app[\duckBus] === attemptDuckBus) { app[\duckBus] = nil };
+                    if (app[\duckNode] === attemptDuckNode) { app[\duckNode] = nil };
                     if (app[\sampleBuffers] === attemptBuffers) {
                         app[\sampleBuffers] = Dictionary.new;
                     };
@@ -92,8 +102,14 @@
                                 server.sync;
                                 attemptBus = Bus.audio(server, 2);
                                 app[\mixBus] = attemptBus;
+                                attemptDuckBus = Bus.control(server, 1);
+                                attemptDuckBus.set(1);
+                                app[\duckBus] = attemptDuckBus;
                                 attemptGroup = Group.head(server);
                                 app[\voiceGroup] = attemptGroup;
+                                attemptDuckNode = Synth.before(attemptGroup, \bbDuck,
+                                    [\out, attemptDuckBus.index]);
+                                app[\duckNode] = attemptDuckNode;
                                 attemptMaster = Synth.tail(server, \bbMaster, [
                                     \in, attemptBus.index,
                                     \amp, 0,
@@ -159,35 +175,52 @@
 
     app[\shutdown] = {
         var server = app[\server];
-
-        app[\runId] = app[\runId] + 1;
-        app[\bootId] = app[\bootId] + 1;
-        app[\bootTimer].tryPerform(\stop);
-        app[\bootWaiter].tryPerform(\stop);
-        app[\bootTimer] = nil;
-        app[\bootWaiter] = nil;
-        app[\routine].tryPerform(\stop);
-        app[\clock].tryPerform(\clear);
-        app[\clock].tryPerform(\stop);
-        if (server.serverRunning) {
-            app[\voiceGroup].tryPerform(\freeAll);
-            app[\voiceGroup].tryPerform(\free);
-            app[\masterNode].tryPerform(\free);
-            app[\sampleBuffers].values.do { |buffer| buffer.free };
+        var delay = server.latency.max(0) + 0.075;
+        if (app[\shutdownPending] != true) {
+            app[\shutdownPending] = true;
+            app[\shutdownAt] = Main.elapsedTime + delay;
+            app[\runId] = app[\runId] + 1;
+            app[\bootId] = app[\bootId] + 1;
+            app[\bootTimer].tryPerform(\stop);
+            app[\bootWaiter].tryPerform(\stop);
+            app[\bootTimer] = nil;
+            app[\bootWaiter] = nil;
+            app[\routine].tryPerform(\stop);
+            app[\clock].tryPerform(\clear);
+            app[\clock].tryPerform(\stop);
+            if (server.serverRunning) {
+                app[\masterNode].tryPerform(\set, \amp, 0);
+            };
+            app[\state] = \stopped;
+            // Let timestamped note bundles drain before freeing their target
+            // group/buffers or returning bus indices to the allocator.
+            SystemClock.sched(delay, {
+                if (server.serverRunning) {
+                    app[\voiceGroup].tryPerform(\freeAll);
+                    app[\voiceGroup].tryPerform(\free);
+                    app[\masterNode].tryPerform(\free);
+                    app[\duckNode].tryPerform(\free);
+                    app[\sampleBuffers].values.do { |buffer| buffer.free };
+                };
+                app[\mixBus].tryPerform(\free);
+                app[\duckBus].tryPerform(\free);
+                app[\routine] = nil;
+                app[\clock] = nil;
+                app[\voiceGroup] = nil;
+                app[\masterNode] = nil;
+                app[\mixBus] = nil;
+                app[\duckBus] = nil;
+                app[\duckNode] = nil;
+                app[\sampleBuffers] = Dictionary.new;
+                if (app[\serverOwned] and: { server.applicationRunning }) {
+                    server.quit(watchShutDown: false);
+                };
+                app[\serverOwned] = false;
+                app[\shutdownPending] = false;
+                "BALKAN//BASS owned playback resources released.".postln;
+                nil;
+            });
         };
-        app[\mixBus].tryPerform(\free);
-        app[\routine] = nil;
-        app[\clock] = nil;
-        app[\voiceGroup] = nil;
-        app[\masterNode] = nil;
-        app[\mixBus] = nil;
-        app[\sampleBuffers] = Dictionary.new;
-        app[\state] = \stopped;
-
-        if (app[\serverOwned] and: { server.applicationRunning }) {
-            server.quit(watchShutDown: false);
-        };
-        app[\serverOwned] = false;
-        "BALKAN//BASS shutdown requested; owned playback resources released.".postln;
+        (app[\shutdownAt] - Main.elapsedTime).max(0) + 0.1;
     };
 }

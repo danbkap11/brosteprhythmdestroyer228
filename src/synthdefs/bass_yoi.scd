@@ -5,7 +5,7 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     aggression = 0.6, tone = 0.55, texture = 0.5, width = 0.15,
     sync = 1, beatHz = 2.333333, cycleBeats = 1, phaseOffset = 0,
     motionLoop = 0.45, motionStart = 0.1, motionPeak = 1,
-    motionEnd = 0.2, riseFrac = 0.25|
+    motionEnd = 0.2, riseFrac = 0.25, duckBus = -1|
     var safeDur = dur.clip(0.07, 0.95);
     var rise = riseFrac.clip(0.05, 0.8);
     var tail = (safeDur * 0.16).clip(0.018, 0.11);
@@ -62,14 +62,15 @@ SynthDef(\bbYoi, { |out = 0, freq = 73.42, amp = 0.20, dur = 0.3,
     var side = HPF.ar(sawLeft - sawRight, 230) *
         textureCtl * widthCtl * 0.10;
     var stereo = [center + side, center - side];
-    var upper = HPF.ar(HPF.ar(LeakDC.ar(stereo), 150), 150);
+    var upper = HPF.ar(HPF.ar(LeakDC.ar(stereo), 115), 115);
     var output = LPF.ar(upper, cutoff.clip(1500, 8000));
-    var compressed = Compander.ar(output, output, 0.13,
-        1, 0.55, 0.004, 0.09);
+    var compressed = Compander.ar(output, output, 0.26,
+        1, 0.65, 0.006, 0.09);
     var protected = HPF.ar(HPF.ar(
-        LeakDC.ar((compressed * 1.3).tanh), 150), 150);
+        LeakDC.ar((compressed * 2.4).tanh), 115), 115);
     var wobbleGain = 1 - (0.35 * moveCtl *
         motionLoop.clip(0, 1) * (1 - motion));
+    var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
     Out.ar(out, protected * wobbleGain * ampEnv * gateEnv *
-        Lag.kr(amp.clip(0, 0.30), 0.01));
+        Lag.kr(amp.clip(0, 0.30), 0.01) * duck.linlin(0, 1, 0.35, 1));
 })

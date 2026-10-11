@@ -13,6 +13,35 @@ iteration; no external download is required. Export and formal tests remain
 deferred. Sections below this Quick MVP note describe historical planning,
 including a superseded 7/8 version.
 
+The 2026-10-11 rework adds an original seeded rave/brass hook, six composed
+two-bar bass cells, sparse `bbScreech` replies, and `bbBassSample` substitutions
+using bundled CC0 growl/reese chops. `bass.scd` still returns the existing
+`bbSub`/`bbGrowl` Array; `main.scd` explicitly registers each new small module.
+The growl now has three FM operators and bounded band-specific saturation.
+Final mid high-passes are 115 Hz (180 Hz for screech), while sub stays a
+90 Hz low-passed sine. This intentionally retains more low-mid body than
+the historical 150 Hz design; it is not a complementary crossover.
+
+Routing remains one stereo mix bus with an owned voice group before master.
+One owned control bus and `bbDuck` node precede the voice group; existing
+kick events trigger its duck envelope in the same timestamped bundle as all
+other layers. Optional `duckBus = -1` preserves standalone voice use. Sub is
+ducked directly; upper bass retains a 0.35 floor. Stop frees voice children
+after pending bundles drain, preserving the persistent duck/master graph.
+Shutdown then frees only owned nodes, buffers, audio/control buses and clock.
+
+The master keeps peak 0.68 and GUI default -6 dB, with stereo-linked parallel
+compression and measured makeup. A bounded, smoothed `sectionGain` defaults
+to 1 for old callers; the sequencer lowers intro/build/break levels separately
+from the user's master setting. Buildups end with a source-group cut followed
+by the vocal cue; both drops have coherent root sub and contrasting mid
+responses. No GUI, preset or export framework redesign is part of this work.
+
+Actual compatible Linux SC 3.13.0 compilation, NRT rendering, dummy-JACK
+lifecycle and offscreen Qt checks now exist; macOS SC 3.14.1 and listening
+remain unverified. See PROGRESS.md. This validation is evidence, not a new
+prerequisite or formal test-suite requirement for this personal app.
+
 Historical listening feedback on 2026-10-11 authorized a 32-bar, 48-second
 phrase at 140 BPM: intro 4 bars → build 4 → drop A 8 → break 4 → build 4 →
 drop B 8. That version kept 7/8 grouped 2+2+3, the native GUI and transport,
@@ -28,7 +57,7 @@ Add native Qt controls for Play/Stop, status, BPM, master level, and the existin
 
 The first milestone is a working macOS launch and manual play/tweak/stop loop, with concise launch instructions. Formal test infrastructure, NRT/export, more bass families, folk and cross-synthesis voices, complex arrangement, and performance profiling are deferred. Do not make those items prerequisites to using this MVP. Keep this scope note authoritative over the longer roadmap and acceptance gates below until the user asks to resume them. Record runtime validation as unavailable in the cloud; do not imply it has passed.
 
-Status: the architecture and backlog below remain the long-term reference. The current user-approved target is a playable macOS SuperCollider 3.14.1 app with native Qt controls. This cloud workspace has no sclang or scsynth, so compilation here is unavailable; implementation for the user’s Mac can proceed.
+Status: the architecture and backlog below remain the historical long-term reference. The current user-approved target is a playable macOS SuperCollider 3.14.1 app with native Qt controls; current validation evidence is recorded above and in PROGRESS.md.
 
 ## 1. Project direction and scope
 

@@ -5,7 +5,7 @@ SynthDef(\bbAccent, { |out = 0, freq = 73.42, amp = 0.30, dur = 0.3,
     aggression = 0.7, tone = 0.55, texture = 0.5, width = 0.15,
     sync = 1, beatHz = 2.333333, cycleBeats = 1, phaseOffset = 0,
     motionLoop = 0.45, motionStart = 0.1, motionPeak = 1,
-    motionEnd = 0.2, riseFrac = 0.25|
+    motionEnd = 0.2, riseFrac = 0.25, duckBus = -1|
     var safeDur = dur.clip(0.07, 0.95);
     var rise = riseFrac.clip(0.05, 0.8);
     var tail = (safeDur * 0.16).clip(0.018, 0.11);
@@ -68,12 +68,13 @@ SynthDef(\bbAccent, { |out = 0, freq = 73.42, amp = 0.30, dur = 0.3,
         textureCtl * widthCtl * 0.08;
     var stereo = [center + side, center - side];
     // Protect the mono sub band after all nonlinear processing.
-    var upper = HPF.ar(HPF.ar(LeakDC.ar(stereo), 150), 150);
+    var upper = HPF.ar(HPF.ar(LeakDC.ar(stereo), 115), 115);
     var output = LPF.ar(upper, cutoff.clip(1500, 8000));
-    var compressed = Compander.ar(output, output, 0.14,
-        1, 0.55, 0.004, 0.09);
+    var compressed = Compander.ar(output, output, 0.28,
+        1, 0.65, 0.006, 0.09);
     var protected = HPF.ar(HPF.ar(
-        LeakDC.ar((compressed * 1.2).tanh), 150), 150);
+        LeakDC.ar((compressed * 1.4).tanh), 115), 115);
+    var duck = Select.kr(duckBus >= 0, [1, In.kr(duckBus.max(0), 1)]);
     Out.ar(out, protected * ampEnv * gateEnv *
-        Lag.kr(amp.clip(0, 0.32), 0.01));
+        Lag.kr(amp.clip(0, 0.32), 0.01) * duck.linlin(0, 1, 0.35, 1));
 })
